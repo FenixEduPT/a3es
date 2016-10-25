@@ -1,0 +1,218 @@
+package org.fenixedu.a3es.domain;
+
+enum org.fenixedu.a3es.domain.A3esDegreeType as A3esDegreeType;
+
+class AccreditationProcess {
+	protected String processName (REQUIRED);
+	protected DateTime beginFillingPeriod (REQUIRED);
+    protected DateTime endFillingPeriod (REQUIRED);
+}
+
+class A3esFile {
+	protected String fileName (REQUIRED);
+}
+
+class DegreeFile extends A3esFile {
+	String degreeCode;
+}
+
+class CurricularUnitFile extends A3esFile {
+	protected String responsibleTeacherAndTeachingHours;
+	protected String otherTeachersAndTeachingHours;
+	protected LocalizedString learningOutcomes;
+	protected LocalizedString syllabus;
+	protected LocalizedString syllabusDemonstration;
+	protected LocalizedString teachingMethodologies ;
+	protected LocalizedString teachingMethodologiesDemonstration;
+	protected String bibliographicReferences;
+}
+
+class TeacherFile extends A3esFile {
+	protected String teacherName (REQUIRED);
+	protected String institution;
+	protected String organicUnit;
+	protected String researchUnit;
+	protected Integer regime;
+	protected A3esDegreeType a3esDegreeType;
+	protected String degreeScientificArea;
+	protected Integer degreeYear;
+	protected String degreeInstitution;
+}
+
+class A3esTeacherCategory {
+	LocalizedString name;
+}
+
+class A3esQualification {
+	String degree;
+	Integer year;
+	String area;
+	String institution;
+	String classification;
+}
+
+class TeacherActivity {
+	protected Integer order;
+	String activity;
+}
+
+class ScientificActivity extends TeacherActivity{
+}
+
+class DevelopmentActivity extends TeacherActivity{
+}
+
+class OtherPublicationActivity extends TeacherActivity{
+}
+
+class OtherProfessionalActivity extends TeacherActivity{
+}
+
+class A3esTeachingService {
+	String curricularUnitName;
+	String studyCycles;
+	String methodologyTypes;
+	Float totalHours;
+}
+
+relation A3esFilePersistentGroup {
+    .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole responsibleGroup {
+        multiplicity 0..1;
+    }
+    A3esFile playsRole a3esFile {
+        multiplicity *;
+    }
+}
+
+relation AccreditationProcessBennu {
+    AccreditationProcess playsRole accreditationProcess {
+        multiplicity *;
+    }
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu;
+}
+
+relation AccreditationProcessExecutionYear {
+    AccreditationProcess playsRole accreditationProcess {
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
+        multiplicity 1..1;
+    }
+}
+
+relation AccreditationProcessDegreeFile {
+    AccreditationProcess playsRole accreditationProcess {
+        multiplicity 1..1;
+    }
+    DegreeFile playsRole degreeFile {
+        multiplicity *;
+    }
+}
+
+relation DegreeFileCurricularUnitFile {
+	DegreeFile playsRole degreeFile {
+        multiplicity 1..1;
+    }
+    CurricularUnitFile playsRole curricularUnitFile {
+    	multiplicity *;
+    }
+}
+
+relation A3esFileTeacherFile {
+   A3esFile playsRole a3esFile {
+        multiplicity 1..*;
+    }
+    TeacherFile playsRole teacherFile {
+        multiplicity *;
+    }
+}
+
+relation TeacherFileTeacher {
+    .org.fenixedu.bennu.core.domain.User playsRole user {
+        multiplicity 0..1;
+    }
+    TeacherFile playsRole teacherFile {
+        multiplicity *;
+    }
+}
+
+relation A3esTeacherCategoryBennu {
+    A3esTeacherCategory playsRole a3esTeacherCategory {
+        multiplicity *;
+    }
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu;
+}
+
+
+relation A3esTeacherCategoryTeacherCategory {
+    .org.fenixedu.academic.domain.TeacherCategory playsRole teacherCategory {
+        multiplicity *;
+    }
+    A3esTeacherCategory playsRole a3esTeacherCategory {
+        multiplicity 0..1;
+    }
+}
+
+relation A3esTeacherCategoryTeacherFile {
+    TeacherFile playsRole teacherFile {
+        multiplicity *;
+    }
+    A3esTeacherCategory playsRole a3esTeacherCategory {
+        multiplicity 0..1;
+    }
+}
+
+relation A3esQualificationTeacherFile {
+    TeacherFile playsRole teacherFile {
+        multiplicity 1;
+    }
+    A3esQualification playsRole a3esQualification {
+        multiplicity *;
+    }
+}
+
+relation ScientificActivityTeacherFile {
+    TeacherFile playsRole teacherFile {
+        multiplicity 1;
+    }
+    ScientificActivity playsRole scientificActivity {
+        multiplicity *;
+    }
+}
+
+relation DevelopmentActivityTeacherFile {
+    TeacherFile playsRole teacherFile {
+        multiplicity 1;
+    }
+    DevelopmentActivity playsRole developmentActivity {
+        multiplicity *;
+    }
+}
+
+relation OtherPublicationActivityTeacherFile {
+    TeacherFile playsRole teacherFile {
+        multiplicity 1;
+    }
+    OtherPublicationActivity playsRole otherPublicationActivity {
+        multiplicity *;
+    }
+}
+
+relation OtherProfessionalActivityTeacherFile {
+    TeacherFile playsRole teacherFile {
+        multiplicity 1;
+    }
+    OtherProfessionalActivity playsRole otherProfessionalActivity {
+        multiplicity *;
+    }
+}
+
+
+relation A3esTeachingServiceTeacherFile {
+    TeacherFile playsRole teacherFile {
+        multiplicity 1;
+    }
+    A3esTeachingService playsRole a3esTeachingService {
+        multiplicity *;
+    }
+}
