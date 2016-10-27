@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>a3es</artifactId>
-	<version>DEV-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>A3ES</name>
