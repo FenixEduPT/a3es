@@ -23,6 +23,7 @@ ${portal.toolkit()}
 <hr />
 
 <form:form role="form" modelAttribute="form" method="POST" class="form-horizontal">
+	${csrf.field()}
 	<h2><spring:message code="label.personalData" /></h2>
 	<div class="form-group">
 		<label for=teacherName class="col-sm-3 control-label"><spring:message code="label.name" />:</label>

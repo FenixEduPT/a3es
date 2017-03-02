@@ -16,6 +16,7 @@ ${portal.toolkit()}
 
 <spring:url var="editUrl" value="/accreditationProcess/editDegreeFile"></spring:url>
 <form:form role="form" modelAttribute="form" method="POST" class="form-horizontal" action="${editUrl}">
+	${csrf.field()}
 	<input type="hidden" name="degreeFile" value="<c:out value='${form.degreeFile.externalId}'/>"/>
 	<div class="form-group">
 		<label for="fileName" class="col-sm-2 control-label"><spring:message code="label.degree" /></label>

@@ -70,6 +70,7 @@ $(document).ready(function() {
 
 <spring:url var="editUrl" value="/accreditationProcess/editProcess"></spring:url>
 <form:form role="form" modelAttribute="form" method="POST" class="form-horizontal" action="${editUrl}">
+	${csrf.field()}
 	<input type="hidden" name="accreditationProcess" value="<c:out value='${form.accreditationProcess.externalId}'/>"/>
 	<div class="form-group">
 		<label for="name" class="col-sm-2 control-label"><spring:message code="label.name" />:</label>

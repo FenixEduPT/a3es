@@ -23,6 +23,7 @@ ${portal.toolkit()}
 
 
 <form:form role="form" modelAttribute="form" method="POST" class="form-horizontal" action="${editUrl}">
+	${csrf.field()}
 	<input type="hidden" name="curricularUnitFile" value="<c:out value='${form.curricularUnitFile.externalId}'/>"/>
 	<input type="hidden" name="degreeFile" value="<c:out value='${form.degreeFile.externalId}'/>"/>
 	<hr />
