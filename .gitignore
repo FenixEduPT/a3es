@@ -11,6 +11,11 @@
 .classpath
 output/
 
+# IntelliJ # 
+
+.idea/
+*.iml
+
 # Maven #
 target/
 bin/
