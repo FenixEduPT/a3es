@@ -68,6 +68,7 @@ $(document).ready( function() {
 
 
 <form:form role="form" modelAttribute="form" method="POST" class="form-horizontal" action="${editUrl}">
+	${csrf.field()}
 	<h2><spring:message code="label.personalData" /></h2>
 	<input type="hidden" name="teacherFile" value="<c:out value='${form.teacherFile.externalId}'/>"/>
 	<input type="hidden" name="degreeFile" value="<c:out value='${form.degreeFile.externalId}'/>"/>

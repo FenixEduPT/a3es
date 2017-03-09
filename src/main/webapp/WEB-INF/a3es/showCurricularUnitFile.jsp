@@ -32,6 +32,7 @@ $().ready(function() {
 <a class="btn btn-default" href="${backUrl}"><i class="glyphicon glyphicon-chevron-left"></i> <spring:message code="label.back"/></a>
 
 <form:form role="form" modelAttribute="form" class="form-horizontal" >
+	${csrf.field()}
 	<hr />
 	<div class="form-group">
 		<label for="curricularUnitName" class="col-sm-12"><spring:message code="label.curricularUnit" />:</label>

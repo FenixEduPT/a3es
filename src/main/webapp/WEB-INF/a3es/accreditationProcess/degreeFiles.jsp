@@ -88,7 +88,8 @@ ${portal.toolkit()}
 							</div>
 							<div class="modal-body">
 								<form:form role="form" modelAttribute="form" method="POST" class="form-horizontal" action="${addUrl}">
-								<input type="hidden" name="accreditationProcess" value="<c:out value='${form.accreditationProcess.externalId}'/>"/>
+										${csrf.field()}
+									<input type="hidden" name="accreditationProcess" value="<c:out value='${form.accreditationProcess.externalId}'/>"/>
 								<c:forEach var="degree" items="${form.getDegrees(degreeType)}">
 									<div class="checkbox" ><form:checkbox path="degrees" value="${degree.externalId}" /><c:out value='${degree.name}'/></div> 
 								</c:forEach>
@@ -105,6 +106,7 @@ ${portal.toolkit()}
 			</div>
 		</c:forEach>
 		<form:form role="form" modelAttribute="form" method="POST" class="form-horizontal" action="${addUrl}">
+			${csrf.field()}
 			<input type="hidden" name="accreditationProcess" value="<c:out value='${form.accreditationProcess.externalId}'/>"/>
 			<div class="form-group">
 					<label for="otherDegree" class="col-sm-2 control-label"><spring:message code="label.other"/></label>

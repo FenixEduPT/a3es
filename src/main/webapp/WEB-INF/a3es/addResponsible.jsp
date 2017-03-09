@@ -16,6 +16,7 @@ ${portal.toolkit()}
 
 <spring:url var="addUrl" value="/accreditationProcess/addResponsible"></spring:url>
 <form:form role="form" modelAttribute="form" method="POST" class="form-horizontal" action="${addUrl}">
+	${csrf.field()}
 	<input type="hidden" name="a3esFile" value="<c:out value='${form.a3esFile.externalId}'/>"/>
 	<input type="hidden" name="degreeFile" value="<c:out value='${form.degreeFile.externalId}'/>"/>
 	<div class="form-group">

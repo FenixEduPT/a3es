@@ -6,7 +6,6 @@ import org.fenixedu.a3es.domain.exception.A3esDomainException;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.json.simple.JSONObject;
@@ -45,7 +44,7 @@ public abstract class A3esFile extends A3esFile_Base {
         if (user == null) {
             throw new A3esDomainException("error.invalid.user");
         }
-        Group responsibleGroup = UserGroup.of(user);
+        Group responsibleGroup = Group.users(user);
         if (getResponsibleGroup() != null) {
             responsibleGroup = responsibleGroup.or(getResponsibleGroup().toGroup());
         }

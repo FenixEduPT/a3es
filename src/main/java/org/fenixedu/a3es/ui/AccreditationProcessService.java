@@ -40,7 +40,7 @@ import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.BibliographicReference;
 import org.fenixedu.academic.domain.degreeStructure.RootCourseGroup;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.UserGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -129,7 +129,7 @@ public class AccreditationProcessService {
                     Set<String> otherTeachers = professorship.stream().filter(p -> !p.isResponsibleFor())
                             .map(p -> p.getPerson().getName()).collect(Collectors.toSet());
 
-                    curricularUnitFile.setResponsibleGroup(UserGroup.of(responsibles).toPersistentGroup());
+                    curricularUnitFile.setResponsibleGroup(Group.users(responsibles.stream()).toPersistentGroup());
                     String responsibleTeacherAndTeachingHours = Joiner.on(", ")
                             .join(responsibles.stream().map(u -> u.getPerson().getName()).collect(Collectors.toSet()));
 

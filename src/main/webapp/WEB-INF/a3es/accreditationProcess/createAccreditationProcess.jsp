@@ -70,6 +70,7 @@ $(document).ready(function() {
 
 <spring:url var="createUrl" value="/accreditationProcess/createProcess"></spring:url>
 <form:form role="form" modelAttribute="form" method="POST" class="form-horizontal" action="${createUrl}">
+	${csrf.field()}
 	<div class="form-group">
 		<label for="name" class="col-sm-2 control-label"><spring:message code="label.name" />:</label>
 		<div class="col-sm-10">

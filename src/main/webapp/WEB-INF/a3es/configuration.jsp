@@ -29,6 +29,7 @@ ${ portal.toolkit() }
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<form:form role="form" method="POST" action="${createUrl}">
+							${csrf.field()}
 							<div class="modal-body">
 								<dl class="dl-horizontal"><dt><spring:message code="label.a3esTeacherCategories"/>:</dt>
 								<dd><input id="name" name="name" class="form-control" required="required"/></dd></dl>
@@ -73,7 +74,8 @@ ${ portal.toolkit() }
 													</h4>
 												</div>
 												 <form:form role="form" method="POST" action="${editUrl}">
-												 <input type="hidden" name="teacherCategory" value="<c:out value='${teacherCategory.externalId}'/>"/>
+													 ${csrf.field()}
+													 <input type="hidden" name="teacherCategory" value="<c:out value='${teacherCategory.externalId}'/>"/>
 													<div class="modal-body">
 														<dl class="dl-horizontal"><dt><spring:message code="label.categories"/>:</dt><dd><c:out value="${teacherCategory.name.content}"/>&nbsp;</dd></dl>
 														<dl class="dl-horizontal"><dt><spring:message code="label.a3esTeacherCategories"/>:</dt><dd>
