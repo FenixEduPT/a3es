@@ -27,7 +27,7 @@
 						</td>
 						<td>
 							<c:if test="${file.canBeManageByUser}">
-								<c:forEach var="member" items="${file.responsibleGroup.members}">
+								<c:forEach var="member" items="${file.responsibleGroup.members.iterator()}">
 									<c:out value='${member.person.presentationName}'/>
 									<br/>
 								</c:forEach>

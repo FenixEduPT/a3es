@@ -48,7 +48,7 @@ ${portal.toolkit()}
 			</tr>
 		</thead>
 		<tbody>
-		<c:forEach var="user" items="${form.a3esFile.responsibleGroup.members}">
+		<c:forEach var="user" items="${form.a3esFile.responsibleGroup.members.iterator()}">
 				<tr>
 					<td><c:out value="${user.username}"/></td>
 					<td><c:out value="${user.name}"/></td>
