@@ -30,7 +30,7 @@ ${portal.toolkit()}
 					<td><c:out value="${degreeFile.fileName}"/></td>
 					<td><c:out value="${degreeFile.degreeCode}"/></td>
 					<td>
-						<c:forEach var="member" items="${degreeFile.responsibleGroup.members}">
+						<c:forEach var="member" items="${degreeFile.responsibleGroup.members.iterator()}">
 							<c:out value='${member.person.presentationName}'/>
 							<br/>
 						</c:forEach>
