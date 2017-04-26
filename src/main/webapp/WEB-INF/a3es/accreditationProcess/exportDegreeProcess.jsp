@@ -8,6 +8,7 @@
 
 <spring:url var="exportCurricularUnitFilesUrl" value="/accreditationProcess/exportCurricularUnitFilesToA3es"></spring:url>
 <spring:url var="exportTeacherFilesUrl" value="/accreditationProcess/exportTeacherFilesToA3es"></spring:url>
+<spring:eval expression="T(org.fenixedu.a3es.ui.strategy.MigrationStrategy.AccreditationType).values()" var="accreditationTypes" />
 
 <c:if test="${not empty error}">
 	<div class="alert alert-danger">
@@ -27,6 +28,17 @@
 		<label for="password" class="col-sm-2 control-label"><spring:message code="label.password" />:</label>
 		<div class="col-sm-10">
 			<input id="password" name="password" class="form-control" value="<c:out value='${form.password}'/>" required="required"/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="accreditationType" class="col-sm-2 control-label"><spring:message code="label.accreditationType" />:</label>
+		<div class="col-sm-10">
+			<form:select path="accreditationType" id="accreditationType" class="form-control" required="required">
+				<c:if test="${form.accreditationType==null}">
+					<form:option value="" selected="true" disabled="true"/>
+				</c:if>
+			    <form:options items="${accreditationTypes}" itemLabel="localizedName.content"/>
+			</form:select>
 		</div>
 	</div>
 	<div class="form-group">
