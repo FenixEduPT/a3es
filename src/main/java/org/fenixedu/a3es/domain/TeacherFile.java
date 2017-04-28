@@ -56,9 +56,39 @@ public class TeacherFile extends TeacherFile_Base {
             if (teacherAuthorization != null) {
                 teacherFile.setA3esTeacherCategory(teacherAuthorization.getTeacherCategory().getA3esTeacherCategory());
             }
+            teacherFile.prefill();
         }
         teacherFile.addA3esFile(a3esFile);
         return teacherFile;
+    }
+
+    private void prefill() {
+        if (getUser() != null) {
+            TeacherFile lastTeacherFile =
+                    getUser().getTeacherFileSet().stream()
+                            .filter(f -> !f.equals(this)).sorted(Comparator
+                                    .comparing((TeacherFile f) -> f.getAccreditationProcess().getEndFillingPeriod()).reversed())
+                    .findFirst().orElse(null);
+            if (lastTeacherFile != null) {
+                setA3esDegreeType(lastTeacherFile.getA3esDegreeType());
+                setResearchUnit(lastTeacherFile.getResearchUnit());
+                setDegreeScientificArea(lastTeacherFile.getDegreeScientificArea());
+                setDegreeYear(lastTeacherFile.getDegreeYear());
+                setDegreeInstitution(lastTeacherFile.getDegreeInstitution());
+                lastTeacherFile.getA3esQualificationSet().forEach(qualification -> {
+                    A3esQualification.create(this, qualification.getDegree(), qualification.getYear(), qualification.getArea(),
+                            qualification.getInstitution(), qualification.getClassification());
+                });
+                lastTeacherFile.getScientificActivitySet()
+                        .forEach(publication -> ScientificActivity.create(this, publication.getActivity()));
+                lastTeacherFile.getDevelopmentActivitySet()
+                        .forEach(publication -> DevelopmentActivity.create(this, publication.getActivity()));
+                lastTeacherFile.getOtherPublicationActivitySet()
+                        .forEach(publication -> OtherPublicationActivity.create(this, publication.getActivity()));
+                lastTeacherFile.getOtherProfessionalActivitySet()
+                        .forEach(publication -> OtherProfessionalActivity.create(this, publication.getActivity()));
+            }
+        }
     }
 
     public void edit(String teacherName, String researchUnit, A3esTeacherCategory a3esTeacherCategory, Integer regime,
@@ -118,7 +148,7 @@ public class TeacherFile extends TeacherFile_Base {
             super.deleteDomainObject();
         }
     }
-    
+
     @Deprecated
     public void delete(A3esFile a3esFile) {
         removeA3esFile(a3esFile);
