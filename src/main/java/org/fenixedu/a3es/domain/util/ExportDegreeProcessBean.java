@@ -3,6 +3,7 @@ package org.fenixedu.a3es.domain.util;
 import java.io.Serializable;
 
 import org.fenixedu.a3es.domain.DegreeFile;
+import org.fenixedu.a3es.ui.strategy.MigrationStrategy.AccreditationType;
 
 public class ExportDegreeProcessBean implements Serializable {
 
@@ -15,6 +16,8 @@ public class ExportDegreeProcessBean implements Serializable {
     protected String base64Hash;
 
     protected String formId;
+
+    protected AccreditationType accreditationType;
 
     public ExportDegreeProcessBean() {
     }
@@ -61,6 +64,14 @@ public class ExportDegreeProcessBean implements Serializable {
 
     public void setFormId(String formId) {
         this.formId = formId;
+    }
+
+    public AccreditationType getAccreditationType() {
+        return accreditationType;
+    }
+
+    public void setAccreditationType(AccreditationType accreditationType) {
+        this.accreditationType = accreditationType;
     }
 
 }
