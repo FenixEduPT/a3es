@@ -105,7 +105,7 @@ public class AccreditationProcessController extends AccreditationController {
     @RequestMapping(method = GET, value = "exportProcessFiles/{accreditationProcess}")
     public String exportProcessFiles(Model model, @ModelAttribute AccreditationProcess accreditationProcess,
             RedirectAttributes attrs, HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
+        response.setContentType("application/vnd.ms-excel");
         String fileName = accreditationProcess.getProcessName().replaceAll(" ", "_") + ".xls";
         response.setHeader("Content-Disposition", "filename=" + fileName);
         service.exportProcessFiles(accreditationProcess, response.getOutputStream());
@@ -116,8 +116,8 @@ public class AccreditationProcessController extends AccreditationController {
     @RequestMapping(method = GET, value = "exportDegreeFiles/{degreeFile}")
     public String exportDegreeFiles(Model model, @ModelAttribute DegreeFile degreeFile, RedirectAttributes attrs,
             HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
-        response.setHeader("Content-Disposition", "filename=" + degreeFile.getFileName().replaceAll(" ", "_"));
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "filename=" + degreeFile.getFileName().replaceAll(" ", "_") + ".xls");
         service.exportDegreeFiles(degreeFile, response.getOutputStream());
         response.flushBuffer();
         return null;
