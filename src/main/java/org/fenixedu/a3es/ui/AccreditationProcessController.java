@@ -286,8 +286,8 @@ public class AccreditationProcessController extends AccreditationController {
     @RequestMapping(method = POST, value = "exportCurricularUnitFilesToA3es")
     public String exportCurricularUnitFilesToA3es(Model model, @ModelAttribute ExportDegreeProcessBean form) {
         try {
-            List<String> output = migrationService.exportCurricularUnitFilesToA3es(form);
-            model.addAttribute("output", output);
+            migrationService.exportCurricularUnitFilesToA3es(form);
+            model.addAttribute("output", "label.processing.in.background");
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getLocalizedMessage());
         }
@@ -297,8 +297,8 @@ public class AccreditationProcessController extends AccreditationController {
 
     @RequestMapping(method = POST, value = "exportTeacherFilesToA3es")
     public String exportTeacherFilesToA3es(Model model, @ModelAttribute ExportDegreeProcessBean form) {
-        List<String> output = migrationService.exportTeacherUnitFilesToA3es(form);
-        model.addAttribute("output", output);
+        migrationService.exportTeacherUnitFilesToA3es(form);
+        model.addAttribute("output", "label.processing.in.background");
         model.addAttribute("form", form);
         return "a3es/accreditationProcess/exportDegreeProcess";
     }
