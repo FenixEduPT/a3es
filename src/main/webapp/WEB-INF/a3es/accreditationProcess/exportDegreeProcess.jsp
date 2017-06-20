@@ -55,7 +55,8 @@
 </form:form>
 
 <div>
-<c:forEach var="output" items="${output}">
-	<div><c:out value="${output}"/></div>
-</c:forEach>
-</div>
+<c:if test="${not empty output}">
+	<div class="alert alert-danger">
+		<spring:message code="${output}" />
+	</div>
+</c:if>
