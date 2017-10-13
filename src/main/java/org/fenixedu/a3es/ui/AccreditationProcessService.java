@@ -134,8 +134,8 @@ public class AccreditationProcessService {
                             .join(responsibles.stream().map(u -> u.getPerson().getName()).collect(Collectors.toSet()));
 
                     String otherTeachersAndTeachingHours = Joiner.on(", ").join(otherTeachers);
-                    LocalizedString learningOutcomes = competence.getObjectivesI18N(executionSemester).toLocalizedString();
-                    LocalizedString syllabus = competence.getProgramI18N(executionSemester).toLocalizedString();
+                    LocalizedString learningOutcomes = competence.getObjectivesI18N(executionSemester);
+                    LocalizedString syllabus = competence.getProgramI18N(executionSemester);
                     LocalizedString teachingMethodologies = competence.getLocalizedEvaluationMethod(executionSemester);
 
                     List<String> references = new ArrayList<String>();
