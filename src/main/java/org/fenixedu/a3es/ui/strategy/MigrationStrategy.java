@@ -294,7 +294,7 @@ public class MigrationStrategy {
     }
 
     protected String getTeacherCurriculumnFolderName() {
-        return "4.1.1. Fichas curriculares";
+        return "3.2. Fichas curriculares dos docentes do ciclo de estudos";
     }
 
     protected String getTeacherCurriculumId() {

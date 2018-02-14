@@ -1,5 +1,6 @@
 package org.fenixedu.a3es.ui;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -45,7 +46,12 @@ public class AccreditationProcessMigrationService {
                         try {
                             Authenticate.mock(user);
                             I18N.setLocale(locale);
-                            final List<String> result = s.get();
+                            List<String> result = new ArrayList<String>();
+                            try {
+                                result = s.get();
+                            } catch (RuntimeException e) {
+                                result.add(e.getMessage());
+                            }
                             final SystemSender sender = Bennu.getInstance().getSystemSender();
                             final Recipient recipient = new Recipient(Collections.singleton(user.getPerson()));
                             new Message(sender, recipient, "A3ES Migration Result", StringUtils.join(result, '\n'));
