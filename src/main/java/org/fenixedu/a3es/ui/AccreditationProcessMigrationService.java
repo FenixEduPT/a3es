@@ -1,7 +1,6 @@
 package org.fenixedu.a3es.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
@@ -9,13 +8,10 @@ import java.util.function.Supplier;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.a3es.domain.util.ExportDegreeProcessBean;
 import org.fenixedu.a3es.ui.strategy.MigrationStrategy;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.SystemSender;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.messaging.core.domain.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -29,11 +25,13 @@ public class AccreditationProcessMigrationService {
     private MessageSource messageSource;
 
     public void exportCurricularUnitFilesToA3es(ExportDegreeProcessBean form) {
-        process(Authenticate.getUser(), I18N.getLocale(), () -> MigrationStrategy.getStrategy(form).exportCurricularUnitFilesToA3es(form, messageSource));
+        process(Authenticate.getUser(), I18N.getLocale(),
+                () -> MigrationStrategy.getStrategy(form).exportCurricularUnitFilesToA3es(form, messageSource));
     }
 
     public void exportTeacherUnitFilesToA3es(ExportDegreeProcessBean form) {
-        process(Authenticate.getUser(), I18N.getLocale(), () -> MigrationStrategy.getStrategy(form).exportTeacherUnitFilesToA3es(form, messageSource));
+        process(Authenticate.getUser(), I18N.getLocale(),
+                () -> MigrationStrategy.getStrategy(form).exportTeacherUnitFilesToA3es(form, messageSource));
     }
 
     private <T> void process(final User user, final Locale locale, final Supplier<List<String>> s) {
@@ -44,7 +42,7 @@ public class AccreditationProcessMigrationService {
                     @Override
                     public void run() {
                         try {
-                            Authenticate.mock(user);
+                            Authenticate.mock(user, "System Automation");
                             I18N.setLocale(locale);
                             List<String> result = new ArrayList<String>();
                             try {
@@ -52,9 +50,9 @@ public class AccreditationProcessMigrationService {
                             } catch (RuntimeException e) {
                                 result.add(e.getMessage());
                             }
-                            final SystemSender sender = Bennu.getInstance().getSystemSender();
-                            final Recipient recipient = new Recipient(Collections.singleton(user.getPerson()));
-                            new Message(sender, recipient, "A3ES Migration Result", StringUtils.join(result, '\n'));
+                            Message.fromSystem().to(user.groupOf()).subject("A3ES Migration Result")
+                                    .textBody(StringUtils.join(result, '\n')).send();
+
                         } finally {
                             Authenticate.unmock();
                         }
