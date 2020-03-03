@@ -37,7 +37,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AccreditationProcessController extends AccreditationController {
 
     @Autowired
-    AccreditationProcessService service;
+    protected AccreditationProcessService service;
     
     @Autowired
     AccreditationProcessMigrationService migrationService;

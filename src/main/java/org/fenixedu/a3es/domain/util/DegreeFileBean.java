@@ -9,6 +9,7 @@ public class DegreeFileBean implements Serializable {
     DegreeFile degreeFile;
     String fileName;
     String degreeCode;
+    String degreeAcronym;
 
     public DegreeFileBean() {
     }
@@ -17,6 +18,7 @@ public class DegreeFileBean implements Serializable {
         setDegreeFile(degreeFile);
         setFileName(degreeFile.getFileName());
         setDegreeCode(degreeFile.getDegreeCode());
+        setDegreeAcronym(degreeFile.getDegreeAcronym());
     }
 
     public DegreeFile getDegreeFile() {
@@ -41,6 +43,14 @@ public class DegreeFileBean implements Serializable {
 
     public void setDegreeCode(String degreeCode) {
         this.degreeCode = degreeCode;
+    }
+
+    public String getDegreeAcronym() {
+        return degreeAcronym;
+    }
+
+    public void setDegreeAcronym(String degreeAcronym) {
+        this.degreeAcronym = degreeAcronym;
     }
 
 }

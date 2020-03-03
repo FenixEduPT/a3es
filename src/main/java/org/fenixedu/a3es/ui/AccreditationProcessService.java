@@ -38,7 +38,10 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.BibliographicReference;
+import org.fenixedu.academic.domain.degreeStructure.RegimeType;
 import org.fenixedu.academic.domain.degreeStructure.RootCourseGroup;
+import org.fenixedu.academic.domain.organizationalStructure.ScientificAreaUnit;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
@@ -66,10 +69,8 @@ public class AccreditationProcessService {
     private MessageSource messageSource;
 
     public Set<ExecutionYear> getExecutionYears() {
-        Set<ExecutionYear> years = new TreeSet<>(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR);
-        years.add(ExecutionYear.readCurrentExecutionYear());
-        years.add(ExecutionYear.readCurrentExecutionYear().getPreviousExecutionYear());
-        return years;
+        return Bennu.getInstance().getExecutionYearsSet().stream().sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).limit(5)
+                .collect(Collectors.toCollection(() -> new TreeSet<>(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR)));
     }
 
     @Atomic(mode = TxMode.WRITE)
@@ -97,7 +98,7 @@ public class AccreditationProcessService {
             }
         }
         if (!Strings.isNullOrEmpty(form.getOtherDegree())) {
-            DegreeFile.create(form.getAccreditationProcess(), form.getOtherDegree());
+            DegreeFile.create(form.getAccreditationProcess(), form.getOtherDegree(), null);
         }
         return;
     }
@@ -111,7 +112,7 @@ public class AccreditationProcessService {
     private void createDegreeFile(AccreditationProcess accreditationProcess, Degree degree) {
         ExecutionYear executionYear = accreditationProcess.getExecutionYear();
         String degreeName = degree.getPresentationName(accreditationProcess.getExecutionYear());
-        DegreeFile degreeFile = DegreeFile.create(accreditationProcess, degreeName);
+        DegreeFile degreeFile = DegreeFile.create(accreditationProcess, degreeName, degree.getSigla());
         DegreeCurricularPlan lastActiveDegreeCurricularPlan = degree.getLastActiveDegreeCurricularPlan();
         if (lastActiveDegreeCurricularPlan != null) {
             RootCourseGroup root = lastActiveDegreeCurricularPlan.getRoot();
@@ -119,7 +120,7 @@ public class AccreditationProcessService {
             for (CurricularCourse course : root.getAllCurricularCourses(executionSemester)) {
                 CompetenceCourse competence = course.getCompetenceCourse();
                 if (competence != null) {
-                    String curricularUnitName = competence.getName(executionSemester);
+                    LocalizedString curricularUnitName = competence.getNameI18N(executionSemester);
                     CurricularUnitFile curricularUnitFile = CurricularUnitFile.create(degreeFile, curricularUnitName);
                     Set<Professorship> professorship = course.getAssociatedExecutionCoursesSet().stream()
                             .filter(ec -> executionYear.getExecutionPeriodsSet().contains(ec.getExecutionPeriod()))
@@ -134,6 +135,20 @@ public class AccreditationProcessService {
                             .join(responsibles.stream().map(u -> u.getPerson().getName()).collect(Collectors.toSet()));
 
                     String otherTeachersAndTeachingHours = Joiner.on(", ").join(otherTeachers);
+                    
+                    ScientificAreaUnit scientificAreaUnit = competence.getScientificAreaUnit(executionSemester);
+                    String scientificArea = scientificAreaUnit == null ? null : scientificAreaUnit.getAcronym();
+                    String workingHours = String.valueOf(course.getAutonomousWorkHours(executionSemester));
+                    String contactHours = String.valueOf(course.getContactLoad(executionSemester));
+                    String ects = String.valueOf(course.getEctsCredits(executionSemester));
+                    RegimeType regime = course.getRegime(executionSemester);
+                    String courseRegime = regime == null ? null : regime.getLocalizedName();
+                    LocalizedString observations = new LocalizedString();
+                    if (course.isOptionalCurricularCourse()) {
+                        CoreConfiguration.supportedLocales().forEach(locale -> {
+                            observations.with(locale, messageSource.getMessage("label.optionalCourse", null, locale));
+                        });
+                    }
                     LocalizedString learningOutcomes = competence.getObjectivesI18N(executionSemester);
                     LocalizedString syllabus = competence.getProgramI18N(executionSemester);
                     LocalizedString teachingMethodologies = competence.getLocalizedEvaluationMethod(executionSemester);
@@ -149,8 +164,10 @@ public class AccreditationProcessService {
                     }
 
                     String bibliographicReferencesString = Joiner.on("; ").join(references);
-                    curricularUnitFile.edit(responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes,
-                            syllabus, null, teachingMethodologies, null, bibliographicReferencesString);
+                    
+                    curricularUnitFile.edit(scientificArea, courseRegime, workingHours, contactHours, ects, observations,
+                            responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes, syllabus, null,
+                            teachingMethodologies, null, bibliographicReferencesString);
 
                     for (Professorship professorhip : professorship) {
                         TeacherFile teacherFile =
@@ -166,7 +183,7 @@ public class AccreditationProcessService {
 
     @Atomic(mode = TxMode.WRITE)
     public void editDegreeFile(DegreeFileBean form) {
-        form.getDegreeFile().edit(form.getFileName(), form.getDegreeCode());
+        form.getDegreeFile().edit(form.getFileName(), form.getDegreeCode(), form.getDegreeAcronym());
     }
 
     @Atomic(mode = TxMode.WRITE)
@@ -186,9 +203,11 @@ public class AccreditationProcessService {
 
     @Atomic(mode = TxMode.WRITE)
     public void editCurricularUnitFile(CurricularUnitFileBean form) {
-        form.getCurricularUnitFile().edit(form.getResponsibleTeacherAndTeachingHours(), form.getOtherTeachersAndTeachingHours(),
-                form.getLearningOutcomes(), form.getSyllabus(), form.getSyllabusDemonstration(), form.getTeachingMethodologies(),
-                form.getTeachingMethodologiesDemonstration(), form.getBibliographicReferences());
+        form.getCurricularUnitFile().edit(form.getScientificArea(), form.getCourseRegime(), form.getWorkingHours(),
+                form.getContactHours(), form.getEcts(), form.getObservations(), form.getResponsibleTeacherAndTeachingHours(),
+                form.getOtherTeachersAndTeachingHours(), form.getLearningOutcomes(), form.getSyllabus(),
+                form.getSyllabusDemonstration(), form.getTeachingMethodologies(), form.getTeachingMethodologiesDemonstration(),
+                form.getBibliographicReferences());
     }
 
     @Atomic(mode = TxMode.WRITE)
@@ -289,7 +308,19 @@ public class AccreditationProcessService {
                     @Override
                     protected void makeLine(CurricularUnitFile curricularUnitFile) {
                         addCell(message("label.degree"), curricularUnitFile.getDegreeFile().getFileName());
-                        addCell(message("label.curricularUnit"), curricularUnitFile.getFileName());
+                        for (Locale locale : CoreConfiguration.supportedLocales()) {
+                            addCell(String.format("%s (%s)", message("label.curricularUnit"), locale.getDisplayLanguage()),
+                                    getLocalizedStringContent(curricularUnitFile.getCurricularUnitName(), locale));
+                        }
+                        addCell(message("label.scientificAreaAcronym"), curricularUnitFile.getScientificArea());
+                        addCell(message("label.courseRegime"), curricularUnitFile.getCourseRegime());
+                        addCell(message("label.workingHours"), curricularUnitFile.getWorkingHours());
+                        addCell(message("label.contactHours"), curricularUnitFile.getContactHours());
+                        addCell(message("label.ects"), curricularUnitFile.getEcts());
+                        for (Locale locale : CoreConfiguration.supportedLocales()) {
+                            addCell(String.format("%s (%s)", message("label.observations"), locale.getDisplayLanguage()),
+                                    getLocalizedStringContent(curricularUnitFile.getObservations(), locale));
+                        }
                         addCell(message("label.responsibleTeacherAndTeachingHours"),
                                 curricularUnitFile.getResponsibleTeacherAndTeachingHours());
                         addCell(message("label.otherTeachersAndTeachingHours"),

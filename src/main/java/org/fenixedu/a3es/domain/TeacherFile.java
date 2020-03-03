@@ -1,8 +1,12 @@
 package org.fenixedu.a3es.domain;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.TreeSet;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -13,12 +17,13 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonArray;
 
 public class TeacherFile extends TeacherFile_Base {
 
     public static final int MAXIMUM_QUALIFICATION_NUMBER = 3;
     public static final int MAXIMUM_ACTIVITIES_NUMBER = 5;
-    public static final int MAXIMUM_TEACHING_SERVICE_NUMBER = 10;
+    public static final int MAXIMUM_TEACHING_SERVICE_NUMBER = 20;
 
     protected TeacherFile(String fileName) {
         super();
@@ -258,6 +263,13 @@ public class TeacherFile extends TeacherFile_Base {
             throw new A3esDomainException("error.exceded.maximum.teaching.service.number");
         }
         super.addA3esTeachingService(a3esTeachingService);
+    }
+    
+    public List<A3esTeachingService> getA3esTeachingService() {
+        ArrayList<A3esTeachingService> result =
+                getA3esTeachingServiceSet().stream().collect(Collectors.toCollection(ArrayList::new));
+        Collections.reverse(result);
+        return result;
     }
 
     public List<A3esQualification> getA3esQualifications() {

@@ -19,6 +19,7 @@ ${portal.toolkit()}
 		<thead>
 			<tr>
 				<th><spring:message code="label.degree"/></th>
+				<th><spring:message code="label.degreeAcronym"/></th>
 				<th><spring:message code="label.degreeCode"/></th>
 				<th></th>
 				<th />
@@ -28,6 +29,7 @@ ${portal.toolkit()}
 		<c:forEach var="degreeFile" items="${form.accreditationProcess.degreeFileSet}">
 				<tr>
 					<td><c:out value="${degreeFile.fileName}"/></td>
+					<td><c:out value="${degreeFile.degreeAcronym}"/></td>
 					<td><c:out value="${degreeFile.degreeCode}"/></td>
 					<td>
 						<c:forEach var="member" items="${degreeFile.responsibleGroup.members.iterator()}">

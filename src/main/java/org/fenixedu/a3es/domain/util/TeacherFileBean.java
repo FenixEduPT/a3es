@@ -1,6 +1,7 @@
 package org.fenixedu.a3es.domain.util;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -69,8 +70,9 @@ public class TeacherFileBean implements Serializable {
         setOtherProfessionalActivitySet(teacherFile.getOtherProfessionalActivitySet().stream().map(a -> new ActivityBean(a))
                 .filter(Objects::nonNull).collect(Collectors.toList()));
 
-        setA3esTeachingServiceBeanSet(teacherFile.getA3esTeachingServiceSet().stream().map(ts -> new A3esTeachingServiceBean(ts))
+        setA3esTeachingServiceBeanSet(teacherFile.getA3esTeachingService().stream().map(ts -> new A3esTeachingServiceBean(ts))
                 .filter(Objects::nonNull).collect(Collectors.toList()));
+
     }
 
     public DegreeFile getDegreeFile() {

@@ -17,7 +17,7 @@ ${portal.toolkit()}
 	<div class="form-group">
 		<label for="curricularUnitName" class="col-sm-2 control-label"><spring:message code="label.curricularUnit" />:</label>
 		<div class="col-sm-10">
-			<input id="curricularUnitName" name="curricularUnitName" class="form-control" value="<c:out value='${form.curricularUnitName}'/>" required="required"/>
+			<input id="curricularUnitName" bennu-localized-string  name="curricularUnitName" class="form-control" value="<c:out value='${form.curricularUnitName}'/>" required="required"/>
 		</div>
 	</div>
 	<div class="form-group">

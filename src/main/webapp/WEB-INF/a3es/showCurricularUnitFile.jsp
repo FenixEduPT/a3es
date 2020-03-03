@@ -16,7 +16,7 @@ $().ready(function() {
 
 </script>
 
-<div class="page-header"><h1><spring:message code="label.curricularUnitFile"/> <small><c:out value="${form.curricularUnitName}"/></small></h1></div>
+<div class="page-header"><h1><spring:message code="label.curricularUnitFile"/> <small><c:out value="${form.curricularUnitName.content}"/></small></h1></div>
 
 <c:if test="${not empty error}">
 	<div class="alert alert-danger">
@@ -37,7 +37,49 @@ $().ready(function() {
 	<div class="form-group">
 		<label for="curricularUnitName" class="col-sm-12"><spring:message code="label.curricularUnit" />:</label>
 		<div class="col-sm-12">
-			<input id="curricularUnitName" name="curricularUnitName" class="form-control" value="<c:out value='${form.curricularUnitName}'/>" readonly="true"/>
+			<input id="curricularUnitName" bennu-localized-string name="curricularUnitName" class="form-control" value="<c:out value='${form.curricularUnitName.json()}'/>" readonly="readonly"/>
+		</div>
+	</div>
+	<hr />
+	<div class="form-group">
+		<label for="scientificArea" class="col-sm-12"><spring:message code="label.scientificAreaAcronym" />:</label>
+		<div class="col-sm-12">
+			<input id="scientificArea" name="scientificArea" class="form-control" value="<c:out value='${form.scientificArea}'/>" readonly="readonly"/>
+		</div>
+	</div>
+	<hr />
+	<div class="form-group">
+		<label for="courseRegime" class="col-sm-12"><spring:message code="label.courseRegime" />:</label>
+		<div class="col-sm-12">
+			<input id="courseRegime" name="courseRegime" class="form-control" value="<c:out value='${form.courseRegime}'/>" readonly="readonly"/>
+		</div>
+	</div>
+	<hr />
+	<div class="form-group">
+		<label for="workingHours" class="col-sm-12"><spring:message code="label.workingHours" />:</label>
+		<div class="col-sm-12">
+			<input id="workingHours" name="workingHours" class="form-control" value="<c:out value='${form.workingHours}'/>" readonly="readonly"/>
+		</div>
+	</div>
+	<hr />
+	<div class="form-group">
+		<label for="contactHours" class="col-sm-12"><spring:message code="label.contactHours" />:</label>
+		<div class="col-sm-12">
+			<input id="contactHours" name="contactHours" class="form-control" value="<c:out value='${form.contactHours}'/>" readonly="readonly"/>
+		</div>
+	</div>
+	<hr />
+	<div class="form-group">
+		<label for="ects" class="col-sm-12"><spring:message code="label.ects" />:</label>
+		<div class="col-sm-12">
+			<input id="ects" name="ects" class="form-control" value="<c:out value='${form.ects}'/>" readonly="readonly"/>
+		</div>
+	</div>
+	<hr />
+	<div class="form-group">
+		<label for="observations" class="col-sm-12"><spring:message code="label.observations" />:</label>
+		<div class="col-sm-12 ">
+			<textarea bennu-localized-string name="observations" id="observations" readonly="readonly"><c:out value="${form.observations.json()}"/></textarea>
 		</div>
 	</div>
 	<hr />
