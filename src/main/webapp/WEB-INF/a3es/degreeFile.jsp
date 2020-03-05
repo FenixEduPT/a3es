@@ -25,6 +25,12 @@ ${portal.toolkit()}
 		</div>
 	</div>
 	<div class="form-group">
+		<label for="degreeAcronym" class="col-sm-2 control-label"><spring:message code="label.degreeAcronym" /></label>
+		<div class="col-sm-10">
+			<input id="degreeAcronym" name="degreeAcronym" class="form-control" value="<c:out value='${form.degreeAcronym}'/>"/>
+		</div>
+	</div>
+	<div class="form-group">
 		<label for="degreeCode" class="col-sm-2 control-label"><spring:message code="label.degreeCode" /></label>
 		<div class="col-sm-10">
 			<input id="degreeCode" name="degreeCode" class="form-control" value="<c:out value='${form.degreeCode}'/>"/>

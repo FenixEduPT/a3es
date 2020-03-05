@@ -11,21 +11,23 @@ import com.google.common.base.Strings;
 
 public class DegreeFile extends DegreeFile_Base {
 
-    protected DegreeFile(AccreditationProcess accreditationProcess, String degreeName) {
+    protected DegreeFile(AccreditationProcess accreditationProcess, String degreeName, String degreeAcronym) {
         super();
         Objects.requireNonNull(accreditationProcess);
         Objects.requireNonNull(degreeName);
         setAccreditationProcess(accreditationProcess);
         setFileName(degreeName);
+        setDegreeAcronym(degreeAcronym);
     }
 
-    public static DegreeFile create(AccreditationProcess accreditationProcess, String degreeName) {
-        return new DegreeFile(accreditationProcess, degreeName);
+    public static DegreeFile create(AccreditationProcess accreditationProcess, String degreeName, String degreeAcronym) {
+        return new DegreeFile(accreditationProcess, degreeName, degreeAcronym);
     }
 
-    public void edit(String fileName, String degreeCode) {
+    public void edit(String fileName, String degreeCode, String degreeAcronym) {
         setFileName(fileName);
         setDegreeCode(degreeCode);
+        setDegreeAcronym(degreeAcronym);
     }
 
     @Override
@@ -46,6 +48,16 @@ public class DegreeFile extends DegreeFile_Base {
             throw new A3esDomainException("error.degree.code.already.exists.in.process");
         }
         super.setDegreeCode(degreeCode);
+    }
+    
+    @Override
+    public void setDegreeAcronym(String degreeAcronym) {
+        if (getAccreditationProcess().getDegreeFileSet().stream().filter(df -> !df.equals(this)
+                && !Strings.isNullOrEmpty(df.getDegreeAcronym()) && df.getDegreeAcronym().equalsIgnoreCase(degreeAcronym)).findAny()
+                .isPresent()) {
+            throw new A3esDomainException("error.degree.acronym.already.exists.in.process");
+        }
+        super.setDegreeAcronym(degreeAcronym);
     }
 
     public void delete() {

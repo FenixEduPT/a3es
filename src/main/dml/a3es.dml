@@ -13,10 +13,18 @@ class A3esFile {
 }
 
 class DegreeFile extends A3esFile {
+	String degreeAcronym;
 	String degreeCode;
 }
 
 class CurricularUnitFile extends A3esFile {
+	protected LocalizedString curricularUnitName (REQUIRED);
+	protected String scientificArea;
+	protected String courseRegime;
+	protected String workingHours;
+	protected String contactHours;
+	protected String ects;
+	protected LocalizedString observations;
 	protected String responsibleTeacherAndTeachingHours;
 	protected String otherTeachersAndTeachingHours;
 	protected LocalizedString learningOutcomes;

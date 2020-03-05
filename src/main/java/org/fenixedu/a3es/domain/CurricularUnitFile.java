@@ -10,21 +10,29 @@ import com.google.common.base.Strings;
 
 public class CurricularUnitFile extends CurricularUnitFile_Base {
 
-    protected CurricularUnitFile(DegreeFile degreeFile, String curricularUnitName) {
+    protected CurricularUnitFile(DegreeFile degreeFile, LocalizedString curricularUnitName) {
         Objects.requireNonNull(degreeFile);
         Objects.requireNonNull(curricularUnitName);
         setDegreeFile(degreeFile);
-        setFileName(curricularUnitName);
+        setFileName(curricularUnitName.getContent(Locale.forLanguageTag(CoreConfiguration.getConfiguration().defaultLocale())));
+        setCurricularUnitName(curricularUnitName);
     }
 
-    public static CurricularUnitFile create(DegreeFile degreeFile, String curricularUnitName) {
+    public static CurricularUnitFile create(DegreeFile degreeFile, LocalizedString curricularUnitName) {
         return new CurricularUnitFile(degreeFile, curricularUnitName);
     }
 
-    public void edit(String responsibleTeacherAndTeachingHours, String otherTeachersAndTeachingHours,
+    public void edit(String scientificArea, String courseRegime, String workingHours, String contactHours, String ects,
+            LocalizedString observations, String responsibleTeacherAndTeachingHours, String otherTeachersAndTeachingHours,
             LocalizedString learningOutcomes, LocalizedString syllabus, LocalizedString syllabusDemonstration,
             LocalizedString teachingMethodologies, LocalizedString teachingMethodologiesDemonstration,
             String bibliographicReferences) {
+        setScientificArea(scientificArea);
+        setCourseRegime(courseRegime);
+        setWorkingHours(workingHours);
+        setContactHours(contactHours);
+        setEcts(ects);
+        setObservations(observations);
         setResponsibleTeacherAndTeachingHours(responsibleTeacherAndTeachingHours);
         setOtherTeachersAndTeachingHours(otherTeachersAndTeachingHours);
         setLearningOutcomes(learningOutcomes);
@@ -33,6 +41,41 @@ public class CurricularUnitFile extends CurricularUnitFile_Base {
         setTeachingMethodologies(teachingMethodologies);
         setTeachingMethodologiesDemonstration(teachingMethodologiesDemonstration);
         setBibliographicReferences(bibliographicReferences);
+    }
+
+    @Override
+    public LocalizedString getCurricularUnitName() {
+        return super.getCurricularUnitName();
+    }
+
+    @Override
+    public String getScientificArea() {
+        return super.getScientificArea();
+    }
+
+    @Override
+    public String getCourseRegime() {
+        return super.getCourseRegime();
+    }
+
+    @Override
+    public String getWorkingHours() {
+        return super.getWorkingHours();
+    }
+
+    @Override
+    public String getContactHours() {
+        return super.getContactHours();
+    }
+
+    @Override
+    public String getEcts() {
+        return super.getEcts();
+    }
+
+    @Override
+    public LocalizedString getObservations() {
+        return super.getObservations();
     }
 
     @Override

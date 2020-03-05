@@ -10,7 +10,13 @@ public class CurricularUnitFileBean implements Serializable {
 
     DegreeFile degreeFile;
     CurricularUnitFile curricularUnitFile;
-    String curricularUnitName;
+    LocalizedString curricularUnitName;
+    String scientificArea;
+    String courseRegime;
+    String workingHours;
+    String contactHours;
+    String ects;
+    LocalizedString observations;
     String responsibleTeacherAndTeachingHours;
     String otherTeachersAndTeachingHours;
     LocalizedString learningOutcomes;
@@ -25,7 +31,13 @@ public class CurricularUnitFileBean implements Serializable {
 
     public CurricularUnitFileBean(CurricularUnitFile curricularUnitFile) {
         setCurricularUnitFile(curricularUnitFile);
-        setCurricularUnitName(curricularUnitFile.getFileName());
+        setCurricularUnitName(curricularUnitFile.getCurricularUnitName());
+        setScientificArea(curricularUnitFile.getScientificArea());
+        setCourseRegime(curricularUnitFile.getCourseRegime());
+        setWorkingHours(curricularUnitFile.getWorkingHours());
+        setContactHours(curricularUnitFile.getContactHours());
+        setEcts(curricularUnitFile.getEcts());
+        setObservations(curricularUnitFile.getObservations());
         setResponsibleTeacherAndTeachingHours(curricularUnitFile.getResponsibleTeacherAndTeachingHours());
         setOtherTeachersAndTeachingHours(curricularUnitFile.getOtherTeachersAndTeachingHours());
         setLearningOutcomes(curricularUnitFile.getLearningOutcomes());
@@ -52,12 +64,60 @@ public class CurricularUnitFileBean implements Serializable {
         this.curricularUnitFile = curricularUnitFile;
     }
 
-    public String getCurricularUnitName() {
+    public LocalizedString getCurricularUnitName() {
         return curricularUnitName;
     }
 
-    public void setCurricularUnitName(String curricularUnitName) {
+    public void setCurricularUnitName(LocalizedString curricularUnitName) {
         this.curricularUnitName = curricularUnitName;
+    }
+    
+    public String getScientificArea() {
+        return scientificArea;
+    }
+
+    public void setScientificArea(String scientificArea) {
+        this.scientificArea= scientificArea;
+    }
+
+    public String getCourseRegime() {
+        return courseRegime;
+    }
+
+    public void setCourseRegime(String courseRegime) {
+        this.courseRegime = courseRegime;
+    }
+
+    public String getWorkingHours() {
+        return workingHours;
+    }
+
+    public void setWorkingHours(String workingHours) {
+        this.workingHours = workingHours;
+    }
+
+    public String getContactHours() {
+        return contactHours;
+    }
+
+    public void setContactHours(String contactHours) {
+        this.contactHours = contactHours;
+    }
+
+    public String getEcts() {
+        return ects;
+    }
+
+    public void setEcts(String ects) {
+        this.ects = ects;
+    }
+
+    public LocalizedString getObservations() {
+        return observations;
+    }
+
+    public void setObservations(LocalizedString observations) {
+        this.observations = observations;
     }
 
     public String getResponsibleTeacherAndTeachingHours() {

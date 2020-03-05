@@ -41,7 +41,6 @@
 	</div>
 	<div class="row">
 		<div class="col-sm-10 col-sm-offset-2">
-			<a class="btn btn-default" href="${pageContext.request.contextPath}/accreditationProcess"><i class="glyphicon glyphicon-chevron-left"></i> <spring:message code="label.back"/></a>	
 			<a class="btn btn-default" href="${pageContext.request.contextPath}/accreditationProcess/degreesFiles/${process.externalId}"><i class="glyphicon glyphicon-edit"></i> <spring:message code="label.degrees"/></a>
 			<a class="btn btn-default" href="${pageContext.request.contextPath}/accreditationProcess/exportProcessFiles/${process.externalId}"><i class="glyphicon glyphicon-edit"></i> <spring:message code="label.export"/></a>
 		</div>

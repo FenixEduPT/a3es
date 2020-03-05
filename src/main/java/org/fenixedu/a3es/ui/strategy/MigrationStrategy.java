@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import org.fenixedu.a3es.domain.DegreeFile;
 import org.fenixedu.a3es.domain.TeacherActivity;
+import org.fenixedu.a3es.domain.TeacherFile;
 import org.fenixedu.a3es.domain.util.ExportDegreeProcessBean;
 import org.fenixedu.bennu.A3esSpringConfiguration;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -31,6 +32,8 @@ import org.springframework.context.MessageSource;
 import com.google.common.base.Strings;
 
 public class MigrationStrategy {
+
+    protected static final int TEACHER_SERVICE_ITEMS = 10;
 
     private static final Locale PT = new Locale("pt");
 
@@ -69,6 +72,8 @@ public class MigrationStrategy {
             return new InstitutionalMigrationStrategy();
         } else if (form.getAccreditationType().equals(AccreditationType.ACCREDITATION_RENEWAL)) {
             return new AccreditationRenewalMigrationStrategy();
+        } else if (form.getAccreditationType().equals(AccreditationType.NEW_PROGRAM_ACCREDITATION)) {
+            return new NewProgramAccreditationMigrationStrategy();
         }
         return new MigrationStrategy();
     }
@@ -177,11 +182,13 @@ public class MigrationStrategy {
                             post(webResource().path(API_ANNEX).queryParam("formId", formId).queryParam("folderId", competencesId),
                                     json.getKey().toJSONString());
                     int status = response.getStatus();
+
                     if (status == 201) {
-                        output.add(status + ": " + json.getKey().get(getCompetenceCoursesFieldKey("1")) + ": " + json.getValue());
+                        output.add(status + ": " + ((JSONObject) json.getKey().get(getCompetenceCoursesFieldKey("1.1"))).get("pt")
+                                + ": " + json.getValue());
                     } else {
-                        output.add(status + ": " + json.getKey().get(getCompetenceCoursesFieldKey("1")) + ": "
-                                + response.getEntity() + " input: " + json.getKey().toJSONString());
+                        output.add(status + ": " + ((JSONObject) json.getKey().get(getCompetenceCoursesFieldKey("1.1"))).get("pt")
+                                + ": " + response.getEntity() + " input: " + json.getKey().toJSONString());
                     }
                 }
                 break;
@@ -213,14 +220,20 @@ public class MigrationStrategy {
 
             JSONObject json = new JSONObject();
             StringBuilder output = new StringBuilder();
+            String ukLanguage = " (" + UK.getDisplayLanguage() + ")";
+            String ptLanguage = " (" + PT.getDisplayLanguage() + ")";
 
-            json.put(getCompetenceCoursesFieldKey("1"), curricularUnitFile.getFileName());
+            json.put(getCompetenceCoursesFieldKey("1.1"), curricularUnitFile.getFileName());
+            JSONObject q62111 = new JSONObject();
+            q62111.put("en",
+                    cut(message("label.curricularUnitName") + ukLanguage, curricularUnitFile.getFileName(), output, 1000));
+            q62111.put("pt",
+                    cut(message("label.curricularUnitName") + ptLanguage, curricularUnitFile.getFileName(), output, 1000));
+            json.put(getCompetenceCoursesFieldKey("1.1"), q62111);
+
             json.put(getCompetenceCoursesFieldKey("2"), cut(message("label.responsibleTeacherAndTeachingHours"),
                     curricularUnitFile.getResponsibleTeacherAndTeachingHours(), output, 100));
             json.put(getCompetenceCoursesFieldKey("3"), curricularUnitFile.getOtherTeachersAndTeachingHours());
-
-            String ukLanguage = " (" + UK.getDisplayLanguage() + ")";
-            String ptLanguage = " (" + PT.getDisplayLanguage() + ")";
 
             JSONObject q6214 = new JSONObject();
             q6214.put("en", cut(message("label.learningOutcomes") + ukLanguage,
@@ -416,16 +429,8 @@ public class MigrationStrategy {
                 file.put("form-professional", getJsonActivities(teacherFile.getOtherProfessionalActivitySet(), "profession",
                         "profession", 200, output));
 
-                JSONArray insideLectures = new JSONArray();
-                teacherFile.getA3esTeachingServiceSet().forEach(teachingService -> {
-                    JSONObject lecture = new JSONObject();
-                    lecture.put("curricularUnit", cut("curricularUnit", teachingService.getCurricularUnitName(), output, 100));
-                    lecture.put("studyCycle", cut("studyCycle", teachingService.getStudyCycles(), output, 200));
-                    lecture.put("type", cut("type", teachingService.getMethodologyTypes(), output, 30));
-                    lecture.put("hoursPerWeek", teachingService.getTotalHours());
-                    insideLectures.add(lecture);
-                });
-                file.put("form-unit", insideLectures);
+                setTeachingService(degreeFile, teacherFile, output, file);
+
             }
             toplevel.put("q-cf-cfile", file);
 
@@ -433,6 +438,19 @@ public class MigrationStrategy {
         });
 
         return jsons;
+    }
+
+    protected void setTeachingService(DegreeFile degreeFile, TeacherFile teacherFile, StringBuilder output, JSONObject file) {
+        JSONArray insideLectures = new JSONArray();
+        teacherFile.getA3esTeachingService().forEach(teachingService -> {
+            JSONObject lecture = new JSONObject();
+            lecture.put("curricularUnit", cut("curricularUnit", teachingService.getCurricularUnitName(), output, 100));
+            lecture.put("studyCycle", cut("studyCycle", teachingService.getStudyCycles(), output, 200));
+            lecture.put("type", cut("type", teachingService.getMethodologyTypes(), output, 30));
+            lecture.put("hoursPerWeek", teachingService.getTotalHours());
+            insideLectures.add(lecture);
+        });
+        file.put("form-unit", insideLectures.subList(0, Math.min(TEACHER_SERVICE_ITEMS, insideLectures.size())));
     }
 
     private JSONArray getJsonActivities(Set<? extends TeacherActivity> teacherActivities, String jsonObject, String outputLabel,
@@ -446,7 +464,7 @@ public class MigrationStrategy {
         return researchArray;
     }
 
-    private String cut(String field, String content, StringBuilder output, int size) {
+    protected String cut(String field, String content, StringBuilder output, int size) {
         if (content == null) {
             output.append(message("message.fieldName.empty", field));
         } else {

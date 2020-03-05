@@ -265,6 +265,7 @@ $(document).ready( function() {
 	</c:forEach>
 	
 	<h2><spring:message code="label.teachingServiceAllocation" /> <small><c:forEach var="methodologyType" items="${methodologyTypes}">(<c:out value="${methodologyType.sigla}"/>) <c:out value="${methodologyType.localizedName.content}"/></c:forEach></small></h2>
+	<span class='alert-warning'><spring:message code="message.teachingServiceAllocation.maxElements" /></span>
 	<table class="table table-condensed">
 		<thead>
 			<tr>
