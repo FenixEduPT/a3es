@@ -54,11 +54,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 
 @Service
 public class AccreditationProcessService {
@@ -113,7 +113,7 @@ public class AccreditationProcessService {
         ExecutionYear executionYear = accreditationProcess.getExecutionYear();
         String degreeName = degree.getPresentationName(accreditationProcess.getExecutionYear());
         DegreeFile degreeFile = DegreeFile.create(accreditationProcess, degreeName, degree.getSigla());
-        DegreeCurricularPlan lastActiveDegreeCurricularPlan = degree.getLastActiveDegreeCurricularPlan();
+        DegreeCurricularPlan lastActiveDegreeCurricularPlan = findDegreeCurricularPlan(degree, executionYear);
         if (lastActiveDegreeCurricularPlan != null) {
             RootCourseGroup root = lastActiveDegreeCurricularPlan.getRoot();
             ExecutionSemester executionSemester = executionYear.getExecutionSemesterFor(1);
@@ -181,7 +181,18 @@ public class AccreditationProcessService {
         FILLERS.forEach(f -> f.fill(degree, degreeFile));
     }
 
-    @Atomic(mode = TxMode.WRITE)
+    private DegreeCurricularPlan findDegreeCurricularPlan(final Degree degree, final ExecutionYear executionYear) {
+        for (final DegreeCurricularPlan degreeCurricularPlan : degree.getDegreeCurricularPlansSet()) {
+            for (final ExecutionYear year : degreeCurricularPlan.getRoot().getBeginContextExecutionYears()) {
+                if (year == executionYear) {
+                    return degreeCurricularPlan;
+                }
+            }
+        }
+        return  degree.getLastActiveDegreeCurricularPlan();
+    }
+
+	@Atomic(mode = TxMode.WRITE)
     public void editDegreeFile(DegreeFileBean form) {
         form.getDegreeFile().edit(form.getFileName(), form.getDegreeCode(), form.getDegreeAcronym());
     }
