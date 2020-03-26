@@ -29,7 +29,7 @@ public class InstitutionalMigrationStrategy extends MigrationStrategy {
     }
 
     @Override
-    protected String getTeacherCurriculumnFolderName() {
+    public String getTeacherCurriculumnFolderName() {
         return "D5.1.1 - Fichas curriculares";
     }
 
@@ -39,8 +39,8 @@ public class InstitutionalMigrationStrategy extends MigrationStrategy {
     }
 
     @Override
-    protected boolean isTeacherCurriculumnFolder(JSONObject folder) {
-        return getTeacherCurriculumnFolderName().equals(folder.get("name"))
+    protected boolean isTeacherCurriculumnFolder(String teacherCurriculumnFolderName, JSONObject folder) {
+        return teacherCurriculumnFolderName.equals(folder.get("name"))
                 && Bennu.getInstance().getInstitutionUnit().getName().equals(folder.get("uo"));
     }
 

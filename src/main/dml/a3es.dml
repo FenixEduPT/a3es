@@ -117,12 +117,30 @@ relation AccreditationProcessDegreeFile {
     }
 }
 
+relation DegreeFileDegree {
+    .org.fenixedu.academic.domain.Degree playsRole degree {
+        multiplicity 0..1;
+    }
+    DegreeFile playsRole degreeFile {
+       multiplicity *;
+    }
+}
+
 relation DegreeFileCurricularUnitFile {
 	DegreeFile playsRole degreeFile {
         multiplicity 1..1;
     }
     CurricularUnitFile playsRole curricularUnitFile {
     	multiplicity *;
+    }
+}
+
+relation CurricularCourseCurricularUnitFile {
+	.org.fenixedu.academic.domain.CurricularCourse playsRole curricularCourse {
+        multiplicity 0..1;
+    }
+    CurricularUnitFile playsRole curricularUnitFile {
+    	 multiplicity *;
     }
 }
 

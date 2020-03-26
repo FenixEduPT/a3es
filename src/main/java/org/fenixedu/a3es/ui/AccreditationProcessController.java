@@ -4,6 +4,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import org.fenixedu.a3es.domain.util.DegreeFileBean;
 import org.fenixedu.a3es.domain.util.ExportDegreeProcessBean;
 import org.fenixedu.a3es.domain.util.ResponsibleBean;
 import org.fenixedu.a3es.domain.util.TeacherFileBean;
+import org.fenixedu.a3es.ui.strategy.MigrationStrategy;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -38,14 +40,20 @@ public class AccreditationProcessController extends AccreditationController {
 
     @Autowired
     protected AccreditationProcessService service;
-    
+
     @Autowired
     AccreditationProcessMigrationService migrationService;
 
     @Override
     @RequestMapping
     public String home(Model model) {
-        model.addAttribute("processes", Bennu.getInstance().getAccreditationProcessSet());
+        model.addAttribute(
+                "processes",
+                Bennu.getInstance()
+                        .getAccreditationProcessSet()
+                        .stream()
+                        .sorted(Comparator.comparing((AccreditationProcess ap) -> ap.getBeginFillingPeriod()).reversed()
+                                .thenComparing((AccreditationProcess ap) -> ap.getProcessName())).collect(Collectors.toList()));
         return "a3es/accreditationProcess/accreditationProcesses";
     }
 
@@ -147,8 +155,7 @@ public class AccreditationProcessController extends AccreditationController {
     }
 
     @RequestMapping(method = GET, value = "addDegreeFile/{accreditationProcess}/{degree}")
-    public String addDegreeFile(Model model, @PathVariable AccreditationProcess accreditationProcess,
-            @PathVariable Degree degree) {
+    public String addDegreeFile(Model model, @PathVariable AccreditationProcess accreditationProcess, @PathVariable Degree degree) {
         try {
             service.addDegreeFile(accreditationProcess, degree);
         } catch (Exception e) {
@@ -187,8 +194,8 @@ public class AccreditationProcessController extends AccreditationController {
     }
 
     @RequestMapping(method = GET, value = "addResponsible/{a3esFile}")
-    public String addResponsible(Model model, @PathVariable A3esFile a3esFile,
-            @RequestParam(value = "degreeFile", required = false) DegreeFile degreeFile) {
+    public String addResponsible(Model model, @PathVariable A3esFile a3esFile, @RequestParam(value = "degreeFile",
+            required = false) DegreeFile degreeFile) {
         model.addAttribute("form", new ResponsibleBean(a3esFile, degreeFile));
         return "a3es/addResponsible";
     }
@@ -205,8 +212,8 @@ public class AccreditationProcessController extends AccreditationController {
     }
 
     @RequestMapping(method = GET, value = "removeResponsible/{a3esFile}/{user}")
-    public String removeResponsible(Model model, @PathVariable A3esFile a3esFile, @PathVariable User user,
-            @RequestParam(value = "degreeFile", required = false) DegreeFile degreeFile) {
+    public String removeResponsible(Model model, @PathVariable A3esFile a3esFile, @PathVariable User user, @RequestParam(
+            value = "degreeFile", required = false) DegreeFile degreeFile) {
         try {
             service.removeResponsible(a3esFile, user);
         } catch (Exception e) {
@@ -282,6 +289,19 @@ public class AccreditationProcessController extends AccreditationController {
         model.addAttribute("form", new ExportDegreeProcessBean(degreeFile));
         return "a3es/accreditationProcess/exportDegreeProcess";
     }
+    
+    @RequestMapping(method = POST, value = "exportToA3es")
+    public String changeMigrationStrategy(Model model, @ModelAttribute ExportDegreeProcessBean form) {
+        MigrationStrategy strategy = MigrationStrategy.getStrategy(form);
+        form.setProcessFolderName(strategy.getProcessFolderName());
+        form.setCompetenceCoursesFolderName(strategy.getCompetenceCoursesFolderName());
+        form.setCompetenceCoursesFolderIndex(strategy.getCompetenceCoursesFolderIndex());
+        form.setTeacherCurriculumnFolderName(strategy.getTeacherCurriculumnFolderName());
+        form.setDegreeStudyPlanFolderName(strategy.getDegreeStudyPlanFolderName());
+        form.setDegreeStudyPlanFolderIndex(strategy.getDegreeStudyPlanFolderIndex());
+        model.addAttribute("form", form);
+        return "a3es/accreditationProcess/exportDegreeProcess";
+    }
 
     @RequestMapping(method = POST, value = "exportCurricularUnitFilesToA3es")
     public String exportCurricularUnitFilesToA3es(Model model, @ModelAttribute ExportDegreeProcessBean form) {
@@ -298,6 +318,14 @@ public class AccreditationProcessController extends AccreditationController {
     @RequestMapping(method = POST, value = "exportTeacherFilesToA3es")
     public String exportTeacherFilesToA3es(Model model, @ModelAttribute ExportDegreeProcessBean form) {
         migrationService.exportTeacherUnitFilesToA3es(form);
+        model.addAttribute("output", "label.processing.in.background");
+        model.addAttribute("form", form);
+        return "a3es/accreditationProcess/exportDegreeProcess";
+    }
+    
+    @RequestMapping(method = POST, value = "exportDegreeStudyPlanToA3es")
+    public String exportDegreeStudyPlanToA3es(Model model, @ModelAttribute ExportDegreeProcessBean form) {
+        migrationService.exportDegreeStudyPlanToA3es(form);
         model.addAttribute("output", "label.processing.in.background");
         model.addAttribute("form", form);
         return "a3es/accreditationProcess/exportDegreeProcess";

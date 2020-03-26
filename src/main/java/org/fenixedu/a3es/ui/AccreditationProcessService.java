@@ -98,7 +98,7 @@ public class AccreditationProcessService {
             }
         }
         if (!Strings.isNullOrEmpty(form.getOtherDegree())) {
-            DegreeFile.create(form.getAccreditationProcess(), form.getOtherDegree(), null);
+            DegreeFile.create(form.getAccreditationProcess(), null, form.getOtherDegree(), null);
         }
         return;
     }
@@ -112,7 +112,7 @@ public class AccreditationProcessService {
     private void createDegreeFile(AccreditationProcess accreditationProcess, Degree degree) {
         ExecutionYear executionYear = accreditationProcess.getExecutionYear();
         String degreeName = degree.getPresentationName(accreditationProcess.getExecutionYear());
-        DegreeFile degreeFile = DegreeFile.create(accreditationProcess, degreeName, degree.getSigla());
+        DegreeFile degreeFile = DegreeFile.create(accreditationProcess, degree, degreeName, degree.getSigla());
         DegreeCurricularPlan lastActiveDegreeCurricularPlan = findDegreeCurricularPlan(degree, executionYear);
         if (lastActiveDegreeCurricularPlan != null) {
             RootCourseGroup root = lastActiveDegreeCurricularPlan.getRoot();
@@ -121,7 +121,7 @@ public class AccreditationProcessService {
                 CompetenceCourse competence = course.getCompetenceCourse();
                 if (competence != null) {
                     LocalizedString curricularUnitName = competence.getNameI18N(executionSemester);
-                    CurricularUnitFile curricularUnitFile = CurricularUnitFile.create(degreeFile, curricularUnitName);
+                    CurricularUnitFile curricularUnitFile = CurricularUnitFile.create(degreeFile, course, curricularUnitName);
                     Set<Professorship> professorship = course.getAssociatedExecutionCoursesSet().stream()
                             .filter(ec -> executionYear.getExecutionPeriodsSet().contains(ec.getExecutionPeriod()))
                             .flatMap(ec -> ec.getProfessorshipsSet().stream()).collect(Collectors.toSet());
@@ -209,7 +209,7 @@ public class AccreditationProcessService {
 
     @Atomic(mode = TxMode.WRITE)
     public void createCurricularUnitFile(CurricularUnitFileBean form) {
-        CurricularUnitFile.create(form.getDegreeFile(), form.getCurricularUnitName());
+        CurricularUnitFile.create(form.getDegreeFile(), null, form.getCurricularUnitName());
     }
 
     @Atomic(mode = TxMode.WRITE)

@@ -3,6 +3,7 @@ package org.fenixedu.a3es.domain;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.LocalizedString;
 
@@ -10,16 +11,17 @@ import com.google.common.base.Strings;
 
 public class CurricularUnitFile extends CurricularUnitFile_Base {
 
-    protected CurricularUnitFile(DegreeFile degreeFile, LocalizedString curricularUnitName) {
+    protected CurricularUnitFile(DegreeFile degreeFile, CurricularCourse curricularCourse, LocalizedString curricularUnitName) {
         Objects.requireNonNull(degreeFile);
         Objects.requireNonNull(curricularUnitName);
         setDegreeFile(degreeFile);
+        setCurricularCourse(curricularCourse);
         setFileName(curricularUnitName.getContent(Locale.forLanguageTag(CoreConfiguration.getConfiguration().defaultLocale())));
         setCurricularUnitName(curricularUnitName);
     }
 
-    public static CurricularUnitFile create(DegreeFile degreeFile, LocalizedString curricularUnitName) {
-        return new CurricularUnitFile(degreeFile, curricularUnitName);
+    public static CurricularUnitFile create(DegreeFile degreeFile, CurricularCourse curricularCourse, LocalizedString curricularUnitName) {
+        return new CurricularUnitFile(degreeFile, curricularCourse, curricularUnitName);
     }
 
     public void edit(String scientificArea, String courseRegime, String workingHours, String contactHours, String ects,
@@ -122,6 +124,7 @@ public class CurricularUnitFile extends CurricularUnitFile_Base {
         getTeacherFileSet().forEach(tf -> tf.removeCurricularUnitFile(this));
         setDegreeFile(null);
         setResponsibleGroup(null);
+        setCurricularCourse(null);
         super.deleteDomainObject();
     }
 

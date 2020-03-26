@@ -33,6 +33,11 @@ public class AccreditationProcessMigrationService {
         process(Authenticate.getUser(), I18N.getLocale(),
                 () -> MigrationStrategy.getStrategy(form).exportTeacherUnitFilesToA3es(form, messageSource));
     }
+    
+    public void exportDegreeStudyPlanToA3es(ExportDegreeProcessBean form) {
+        process(Authenticate.getUser(), I18N.getLocale(),
+                () -> MigrationStrategy.getStrategy(form).exportDegreeStudyPlanToA3es(form, messageSource));
+    }
 
     private <T> void process(final User user, final Locale locale, final Supplier<List<String>> s) {
         final Thread thread = new Thread() {

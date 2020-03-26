@@ -6,8 +6,10 @@
 	<h1><spring:message code="label.exportToA3es"/> <small><c:out value="${form.degreeFile.fileName}"/> (<c:out value="${form.degreeFile.accreditationProcess.processName}"/>)</small></h1>
 </div>
 
+<spring:url var="reloadUrl" value="/accreditationProcess/exportToA3es"></spring:url>
 <spring:url var="exportCurricularUnitFilesUrl" value="/accreditationProcess/exportCurricularUnitFilesToA3es"></spring:url>
 <spring:url var="exportTeacherFilesUrl" value="/accreditationProcess/exportTeacherFilesToA3es"></spring:url>
+<spring:url var="exportDegreeStudyPlanUrl" value="/accreditationProcess/exportDegreeStudyPlanToA3es"></spring:url>
 <spring:eval expression="T(org.fenixedu.a3es.ui.strategy.MigrationStrategy.AccreditationType).values()" var="accreditationTypes" />
 
 <c:if test="${not empty error}">
@@ -33,12 +35,48 @@
 	<div class="form-group">
 		<label for="accreditationType" class="col-sm-2 control-label"><spring:message code="label.accreditationType" />:</label>
 		<div class="col-sm-10">
-			<form:select path="accreditationType" id="accreditationType" class="form-control" required="required">
+			<form:select path="accreditationType" id="accreditationType" class="form-control" required="required" onchange='this.form.action="${reloadUrl}";this.form.submit();'>
 				<c:if test="${form.accreditationType==null}">
 					<form:option value="" selected="true" disabled="true"/>
 				</c:if>
 			    <form:options items="${accreditationTypes}" itemLabel="localizedName.content"/>
 			</form:select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="processFolderName" class="col-sm-2 control-label"><spring:message code="label.processFolderName" />:</label>
+		<div class="col-sm-10">
+			<input id="processFolderName" name="processFolderName" class="form-control" value="<c:out value='${form.processFolderName}'/>" required="required"/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="competenceCoursesFolderName" class="col-sm-2 control-label"><spring:message code="label.competenceCoursesFolderName" />:</label>
+		<div class="col-sm-10">
+			<input id="competenceCoursesFolderName" name="competenceCoursesFolderName" class="form-control" value="<c:out value='${form.competenceCoursesFolderName}'/>" required="required"/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="competenceCoursesFolderIndex" class="col-sm-2 control-label"><spring:message code="label.competenceCoursesFolderIndex" />:</label>
+		<div class="col-sm-10">
+			<input id="competenceCoursesFolderIndex" name="competenceCoursesFolderIndex" class="form-control" value="<c:out value='${form.competenceCoursesFolderIndex}'/>" required="required"/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="teacherCurriculumnFolderName" class="col-sm-2 control-label"><spring:message code="label.teacherCurriculumnFolderName" />:</label>
+		<div class="col-sm-10">
+			<input id="teacherCurriculumnFolderName" name="teacherCurriculumnFolderName" class="form-control" value="<c:out value='${form.teacherCurriculumnFolderName}'/>" required="required"/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="degreeStudyPlanFolderName" class="col-sm-2 control-label"><spring:message code="label.degreeStudyPlanFolderName" />:</label>
+		<div class="col-sm-10">
+			<input id="degreeStudyPlanFolderName" name="degreeStudyPlanFolderName" class="form-control" value="<c:out value='${form.degreeStudyPlanFolderName}'/>" required="required"/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="degreeStudyPlanFolderIndex" class="col-sm-2 control-label"><spring:message code="label.degreeStudyPlanFolderIndex" />:</label>
+		<div class="col-sm-10">
+			<input id="degreeStudyPlanFolderIndex" name="degreeStudyPlanFolderIndex" class="form-control" value="<c:out value='${form.degreeStudyPlanFolderIndex}'/>" required="required"/>
 		</div>
 	</div>
 	<div class="form-group">
@@ -50,11 +88,13 @@
 			<button type="submit" class="btn btn-primary" id="form" onclick='this.form.action="${exportTeacherFilesUrl}";'>
 				<i class="glyphicon glyphicon-send"></i> <spring:message code="label.export" /> <spring:message code="label.teacherFiles" />
 			</button>
+			<button type="submit" class="btn btn-primary" id="form" onclick='this.form.action="${exportDegreeStudyPlanUrl}";'>
+				<i class="glyphicon glyphicon-send"></i> <spring:message code="label.export" /> <spring:message code="label.degreeStudyPlan" />
+			</button>			
 		</div>
 	</div>
 </form:form>
 
-<div>
 <c:if test="${not empty output}">
 	<div class="alert alert-danger">
 		<spring:message code="${output}" />
