@@ -10,7 +10,7 @@ textarea.bennu-localized-string-textarea{
 <script type='text/javascript'>
 
 function validateStringSize(fieldName, size) {
-	var escapedLength = getUTF8Length(fieldName.value);
+	var escapedLength = fieldName.value.length;
 	if (escapedLength > size) {
 		$(fieldName).closest(".form-group").find("label").find("span").last().text(getStringSizeMessage(escapedLength, size));
 		$(fieldName).addClass("alert-warning");
@@ -32,9 +32,9 @@ function validateLocalizedStringSize(fieldName, size) {
 		var change = false;
         var attrName = key;
         var attrValue = obj[key];
-        var escapedLength = getUTF8Length(attrValue);
+        var escapedLength = attrValue.length;
     	if (escapedLength > size) {
-            localizedStringSizeMessage = localizedStringSizeMessage + " ("+key.split("-")[0].toUpperCase()+": "+ escapedLength +" de " +size+" bytes)";    		
+            localizedStringSizeMessage = localizedStringSizeMessage + " ("+key.split("-")[0].toUpperCase()+": "+ escapedLength +" de " +size+" caracteres)";    		
     		allLanguageWithValidSize=false;
         }
     }
@@ -98,11 +98,11 @@ function validateMandatoryLocalizedString(fieldName) {
             }
         }
     	if(val[tag]==undefined || val[tag].trim().length == 0){
-    		localizedStringSizeMessage = localizedStringSizeMessage + " ("+tag.split("-")[0].toUpperCase()+": 0 bytes)";    		
+    		localizedStringSizeMessage = localizedStringSizeMessage + " ("+tag.split("-")[0].toUpperCase()+": 0 caracteres)";    		
     		allLanguageFilled = false;
     	}
     }
-	if(allLanguageFilled){
+	if(allLanguageFilled || !$(fieldName).hasClass("mandatoryLocalizedString")){
 		$(fieldName).closest(".form-group").find("label").find("span").last().text();
 		$(fieldName).next("div").find("textarea").removeClass("alert-warning");		        		
 	}else{
@@ -116,6 +116,7 @@ $().ready(function() {
 	$(".mandatoryLocalizedString, .mandatoryString").closest(".form-group").find("label").prepend("<span>(*) </span>");
 	$(".mandatoryLocalizedString, .mandatoryString, .limitedSizeString").closest(".form-group").find("label").append("<span class='alert-warning'></span>");
 	$(".mandatoryLocalizedString").change();
+	$(".limitedSizeString").change();
 	$(".mandatoryString").trigger("oninput");
 	$(".limitedSizeString").trigger("oninput");
 	

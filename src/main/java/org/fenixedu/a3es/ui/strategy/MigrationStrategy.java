@@ -254,11 +254,16 @@ public class MigrationStrategy {
                                     .getContent(PT), output, 1000));
                     json.put(getCompetenceCoursesFieldKey("1.1"), q62111);
 
-                    json.put(getCompetenceCoursesFieldKey("1.2"), curricularUnitFile.getScientificArea());
-                    json.put(getCompetenceCoursesFieldKey("1.3"), curricularUnitFile.getCourseRegime());
-                    json.put(getCompetenceCoursesFieldKey("1.4"), curricularUnitFile.getWorkingHours());
-                    json.put(getCompetenceCoursesFieldKey("1.5"), curricularUnitFile.getContactHours());
-                    json.put(getCompetenceCoursesFieldKey("1.6"), curricularUnitFile.getEcts());
+                    json.put(getCompetenceCoursesFieldKey("1.2"),  cut(message("label.scientificAreaAcronym"),
+                            curricularUnitFile.getScientificArea(), output, 100));
+                    json.put(getCompetenceCoursesFieldKey("1.3"), cut(message("label.courseRegime"),
+                            curricularUnitFile.getCourseRegime(), output, 100));
+                    json.put(getCompetenceCoursesFieldKey("1.4"), cut(message("label.workingHours"),
+                            curricularUnitFile.getWorkingHours(), output, 100));
+                    json.put(getCompetenceCoursesFieldKey("1.5"), cut(message("label.contactHours"),
+                            curricularUnitFile.getContactHours(), output, 100));
+                    json.put(getCompetenceCoursesFieldKey("1.6"), cut(message("label.ects"),
+                            curricularUnitFile.getEcts(), output, 100));
 
                     JSONObject q62117 = new JSONObject();
                     q62117.put(
@@ -678,10 +683,9 @@ public class MigrationStrategy {
         if (content == null) {
             output.append(message("message.fieldName.empty", field));
         } else {
-            int escapedLength = JSONObject.escape(content).getBytes().length;
-            if (escapedLength > size) {
+            if (content.length() > size) {
                 output.append(message("message.field.cutted", field, size));
-                return content.substring(0, size - 4 - (escapedLength - content.length())) + " ...";
+                return content.substring(0, size - 4) + " ...";
             }
         }
         return content;
