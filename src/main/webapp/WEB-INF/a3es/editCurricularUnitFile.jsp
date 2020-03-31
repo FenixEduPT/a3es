@@ -37,42 +37,42 @@ ${portal.toolkit()}
 	<div class="form-group">
 		<label for="scientificArea" class="col-sm-12"><spring:message code="label.scientificAreaAcronym" />:</label>
 		<div class="col-sm-12">
-			<input id="scientificArea" name="scientificArea" class="form-control" value="<c:out value='${form.scientificArea}'/>" />
+			<input id="scientificArea" name="scientificArea" class="form-control limitedSizeString" value="<c:out value='${form.scientificArea}'/>" oninput="validateStringSize(this, 100)"/>
 		</div>
 	</div>
 	<hr />
 	<div class="form-group">
 		<label for="courseRegime" class="col-sm-12"><spring:message code="label.courseRegime" />:</label>
 		<div class="col-sm-12">
-			<input id="courseRegime" name="courseRegime" class="form-control" value="<c:out value='${form.courseRegime}'/>" />
+			<input id="courseRegime" name="courseRegime" class="form-control limitedSizeString" value="<c:out value='${form.courseRegime}'/>" oninput="validateStringSize(this, 100)"/>
 		</div>
 	</div>
 	<hr />
 	<div class="form-group">
 		<label for="workingHours" class="col-sm-12"><spring:message code="label.workingHours" />:</label>
 		<div class="col-sm-12">
-			<input id="workingHours" name="workingHours" class="form-control" value="<c:out value='${form.workingHours}'/>" />
+			<input id="workingHours" name="workingHours" class="form-control limitedSizeString" value="<c:out value='${form.workingHours}'/>" oninput="validateStringSize(this, 100)"/>
 		</div>
 	</div>
 	<hr />
 	<div class="form-group">
 		<label for="contactHours" class="col-sm-12"><spring:message code="label.contactHours" />:</label>
 		<div class="col-sm-12">
-			<input id="contactHours" name="contactHours" class="form-control" value="<c:out value='${form.contactHours}'/>" />
+			<input id="contactHours" name="contactHours" class="form-control limitedSizeString" value="<c:out value='${form.contactHours}'/>" oninput="validateStringSize(this, 100)"/>
 		</div>
 	</div>
 	<hr />
 	<div class="form-group">
 		<label for="ects" class="col-sm-12"><spring:message code="label.ects" />:</label>
 		<div class="col-sm-12">
-			<input id="ects" name="ects" class="form-control" value="<c:out value='${form.ects}'/>" />
+			<input id="ects" name="ects" class="form-control limitedSizeString" value="<c:out value='${form.ects}'/>" oninput="validateStringSize(this, 100)"/>
 		</div>
 	</div>
 	<hr />
 	<div class="form-group">
 		<label for="observations" class="col-sm-12"><spring:message code="label.observations" />:</label>
 		<div class="col-sm-12 ">
-			<textarea bennu-localized-string name="observations" id="observations"  onchange="validateLocalizedStringSize(this, 1000)"><c:out value="${form.observations.json()}"/></textarea>
+			<textarea class="limitedSizeString"  bennu-localized-string name="observations" id="observations"  onchange="validateLocalizedStringSize(this, 1000)"><c:out value="${form.observations.json()}"/></textarea>
 		</div>
 	</div>
 	<hr />

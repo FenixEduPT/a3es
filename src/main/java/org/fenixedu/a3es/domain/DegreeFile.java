@@ -6,12 +6,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.a3es.domain.exception.A3esDomainException;
+import org.fenixedu.academic.domain.Degree;
 
 import com.google.common.base.Strings;
 
 public class DegreeFile extends DegreeFile_Base {
 
-    protected DegreeFile(AccreditationProcess accreditationProcess, String degreeName, String degreeAcronym) {
+    protected DegreeFile(AccreditationProcess accreditationProcess, Degree degree, String degreeName, String degreeAcronym) {
         super();
         Objects.requireNonNull(accreditationProcess);
         Objects.requireNonNull(degreeName);
@@ -20,8 +21,9 @@ public class DegreeFile extends DegreeFile_Base {
         setDegreeAcronym(degreeAcronym);
     }
 
-    public static DegreeFile create(AccreditationProcess accreditationProcess, String degreeName, String degreeAcronym) {
-        return new DegreeFile(accreditationProcess, degreeName, degreeAcronym);
+    public static DegreeFile create(AccreditationProcess accreditationProcess, Degree degree, String degreeName,
+            String degreeAcronym) {
+        return new DegreeFile(accreditationProcess, degree, degreeName, degreeAcronym);
     }
 
     public void edit(String fileName, String degreeCode, String degreeAcronym) {
@@ -65,6 +67,7 @@ public class DegreeFile extends DegreeFile_Base {
         getTeacherFileSet().forEach(tf -> tf.removeDegreeFile(this));
         setAccreditationProcess(null);
         setResponsibleGroup(null);
+        setDegree(null);
         super.deleteDomainObject();
     }
 

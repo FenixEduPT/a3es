@@ -8,22 +8,22 @@ import org.json.simple.JSONObject;
 public class NewProgramAccreditationMigrationStrategy extends MigrationStrategy {
 
     @Override
-    protected String getProcessFolderName() {
+    public String getProcessFolderName() {
         return "Apresentação do pedido - Novo ciclo de estudos";
     }
 
     @Override
-    protected String getCompetenceCoursesFolderIndex() {
+    public String getCompetenceCoursesFolderIndex() {
         return "4.4.";
     }
 
     @Override
-    protected String getCompetenceCoursesFolderName() {
+    public String getCompetenceCoursesFolderName() {
         return getCompetenceCoursesFolderIndex() + " Unidades Curriculares";
     }
 
     @Override
-    protected String getTeacherCurriculumnFolderName() {
+    public String getTeacherCurriculumnFolderName() {
         return "5.2. Fichas curriculares dos docentes do ciclo de estudos";
     }
 

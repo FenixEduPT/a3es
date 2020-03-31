@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -98,7 +99,7 @@ public class AccreditationProcessService {
             }
         }
         if (!Strings.isNullOrEmpty(form.getOtherDegree())) {
-            DegreeFile.create(form.getAccreditationProcess(), form.getOtherDegree(), null);
+            DegreeFile.create(form.getAccreditationProcess(), null, form.getOtherDegree(), null);
         }
         return;
     }
@@ -112,69 +113,76 @@ public class AccreditationProcessService {
     private void createDegreeFile(AccreditationProcess accreditationProcess, Degree degree) {
         ExecutionYear executionYear = accreditationProcess.getExecutionYear();
         String degreeName = degree.getPresentationName(accreditationProcess.getExecutionYear());
-        DegreeFile degreeFile = DegreeFile.create(accreditationProcess, degreeName, degree.getSigla());
+        DegreeFile degreeFile = DegreeFile.create(accreditationProcess, degree, degreeName, degree.getSigla());
         DegreeCurricularPlan lastActiveDegreeCurricularPlan = findDegreeCurricularPlan(degree, executionYear);
         if (lastActiveDegreeCurricularPlan != null) {
             RootCourseGroup root = lastActiveDegreeCurricularPlan.getRoot();
-            ExecutionSemester executionSemester = executionYear.getExecutionSemesterFor(1);
-            for (CurricularCourse course : root.getAllCurricularCourses(executionSemester)) {
-                CompetenceCourse competence = course.getCompetenceCourse();
-                if (competence != null) {
-                    LocalizedString curricularUnitName = competence.getNameI18N(executionSemester);
-                    CurricularUnitFile curricularUnitFile = CurricularUnitFile.create(degreeFile, curricularUnitName);
-                    Set<Professorship> professorship = course.getAssociatedExecutionCoursesSet().stream()
-                            .filter(ec -> executionYear.getExecutionPeriodsSet().contains(ec.getExecutionPeriod()))
-                            .flatMap(ec -> ec.getProfessorshipsSet().stream()).collect(Collectors.toSet());
-                    Set<User> responsibles = professorship.stream().filter(p -> p.isResponsibleFor())
-                            .map(p -> p.getPerson().getUser()).collect(Collectors.toSet());
-                    Set<String> otherTeachers = professorship.stream().filter(p -> !p.isResponsibleFor())
-                            .map(p -> p.getPerson().getName()).collect(Collectors.toSet());
+            Set<CurricularCourse> curricularCourseSet = new HashSet<CurricularCourse>();
+            for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
+                for (CurricularCourse course : root.getAllCurricularCourses(executionSemester)) {
+                    CompetenceCourse competence = course.getCompetenceCourse();
+                    if (competence != null && !curricularCourseSet.contains(course)) {
+                        curricularCourseSet.add(course);
+                        LocalizedString curricularUnitName = competence.getNameI18N(executionSemester);
+                        CurricularUnitFile curricularUnitFile = CurricularUnitFile.create(degreeFile, course, curricularUnitName);
+                        Set<Professorship> professorship =
+                                course.getAssociatedExecutionCoursesSet().stream()
+                                        .filter(ec -> executionYear.getExecutionPeriodsSet().contains(ec.getExecutionPeriod()))
+                                        .flatMap(ec -> ec.getProfessorshipsSet().stream()).collect(Collectors.toSet());
+                        Set<User> responsibles =
+                                professorship.stream().filter(p -> p.isResponsibleFor()).map(p -> p.getPerson().getUser())
+                                        .collect(Collectors.toSet());
+                        Set<String> otherTeachers =
+                                professorship.stream().filter(p -> !p.isResponsibleFor()).map(p -> p.getPerson().getName())
+                                        .collect(Collectors.toSet());
 
-                    curricularUnitFile.setResponsibleGroup(Group.users(responsibles.stream()).toPersistentGroup());
-                    String responsibleTeacherAndTeachingHours = Joiner.on(", ")
-                            .join(responsibles.stream().map(u -> u.getPerson().getName()).collect(Collectors.toSet()));
+                        curricularUnitFile.setResponsibleGroup(Group.users(responsibles.stream()).toPersistentGroup());
+                        String responsibleTeacherAndTeachingHours =
+                                Joiner.on(", ").join(
+                                        responsibles.stream().map(u -> u.getPerson().getName()).collect(Collectors.toSet()));
 
-                    String otherTeachersAndTeachingHours = Joiner.on(", ").join(otherTeachers);
-                    
-                    ScientificAreaUnit scientificAreaUnit = competence.getScientificAreaUnit(executionSemester);
-                    String scientificArea = scientificAreaUnit == null ? null : scientificAreaUnit.getAcronym();
-                    String workingHours = String.valueOf(course.getAutonomousWorkHours(executionSemester));
-                    String contactHours = String.valueOf(course.getContactLoad(executionSemester));
-                    String ects = String.valueOf(course.getEctsCredits(executionSemester));
-                    RegimeType regime = course.getRegime(executionSemester);
-                    String courseRegime = regime == null ? null : regime.getLocalizedName();
-                    LocalizedString observations = new LocalizedString();
-                    if (course.isOptionalCurricularCourse()) {
-                        CoreConfiguration.supportedLocales().forEach(locale -> {
-                            observations.with(locale, messageSource.getMessage("label.optionalCourse", null, locale));
-                        });
-                    }
-                    LocalizedString learningOutcomes = competence.getObjectivesI18N(executionSemester);
-                    LocalizedString syllabus = competence.getProgramI18N(executionSemester);
-                    LocalizedString teachingMethodologies = competence.getLocalizedEvaluationMethod(executionSemester);
+                        String otherTeachersAndTeachingHours = Joiner.on(", ").join(otherTeachers);
 
-                    List<String> references = new ArrayList<String>();
-                    final BibliographicReferences bibliographicReferences =
-                            competence.getBibliographicReferences(executionSemester);
-                    if (bibliographicReferences != null) {
-                        for (BibliographicReference reference : bibliographicReferences.getMainBibliographicReferences()) {
-                            references.add(Joiner.on(", ").join(reference.getTitle(), reference.getAuthors(), reference.getYear(),
-                                    reference.getReference()));
+                        ScientificAreaUnit scientificAreaUnit = competence.getScientificAreaUnit(executionSemester);
+                        String scientificArea = scientificAreaUnit == null ? null : scientificAreaUnit.getAcronym();
+                        String workingHours = String.valueOf(course.getAutonomousWorkHours(executionSemester));
+                        String contactHours = String.valueOf(course.getContactLoad(executionSemester));
+                        String ects = String.valueOf(course.getEctsCredits(executionSemester));
+                        RegimeType regime = course.getRegime(executionSemester);
+                        String courseRegime = regime == null ? null : regime.getLocalizedName();
+                        LocalizedString observations = new LocalizedString();
+                        if (course.isOptionalCurricularCourse()) {
+                            CoreConfiguration.supportedLocales().forEach(locale -> {
+                                observations.with(locale, messageSource.getMessage("label.optionalCourse", null, locale));
+                            });
                         }
-                    }
+                        LocalizedString learningOutcomes = competence.getObjectivesI18N(executionSemester);
+                        LocalizedString syllabus = competence.getProgramI18N(executionSemester);
+                        LocalizedString teachingMethodologies = competence.getLocalizedEvaluationMethod(executionSemester);
 
-                    String bibliographicReferencesString = Joiner.on("; ").join(references);
-                    
-                    curricularUnitFile.edit(scientificArea, courseRegime, workingHours, contactHours, ects, observations,
-                            responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes, syllabus, null,
-                            teachingMethodologies, null, bibliographicReferencesString);
+                        List<String> references = new ArrayList<String>();
+                        final BibliographicReferences bibliographicReferences =
+                                competence.getBibliographicReferences(executionSemester);
+                        if (bibliographicReferences != null) {
+                            for (BibliographicReference reference : bibliographicReferences.getMainBibliographicReferences()) {
+                                references.add(Joiner.on(", ").join(reference.getTitle(), reference.getAuthors(),
+                                        reference.getYear(), reference.getReference()));
+                            }
+                        }
 
-                    for (Professorship professorhip : professorship) {
-                        TeacherFile teacherFile =
-                                TeacherFile.create(professorhip.getTeacher().getPerson().getUser(), curricularUnitFile);
-                        FILLERS.forEach(f -> f.fill(professorhip.getTeacher(), teacherFile, degree));
+                        String bibliographicReferencesString = Joiner.on("; ").join(references);
+
+                        curricularUnitFile.edit(scientificArea, courseRegime, workingHours, contactHours, ects, observations,
+                                responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes, syllabus,
+                                null, teachingMethodologies, null, bibliographicReferencesString);
+
+                        for (Professorship professorhip : professorship) {
+                            TeacherFile teacherFile =
+                                    TeacherFile.create(professorhip.getTeacher().getPerson().getUser(), curricularUnitFile);
+                            FILLERS.forEach(f -> f.fill(professorhip.getTeacher(), teacherFile, degree));
+                        }
+                        FILLERS.forEach(f -> f.fill(course, curricularUnitFile));
                     }
-                    FILLERS.forEach(f -> f.fill(course, curricularUnitFile));
                 }
             }
         }
@@ -209,7 +217,7 @@ public class AccreditationProcessService {
 
     @Atomic(mode = TxMode.WRITE)
     public void createCurricularUnitFile(CurricularUnitFileBean form) {
-        CurricularUnitFile.create(form.getDegreeFile(), form.getCurricularUnitName());
+        CurricularUnitFile.create(form.getDegreeFile(), null, form.getCurricularUnitName());
     }
 
     @Atomic(mode = TxMode.WRITE)
