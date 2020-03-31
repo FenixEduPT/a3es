@@ -49,6 +49,8 @@ public class MigrationStrategy {
 
     private static final Locale UK = Locale.UK;
 
+    private static final LocalizedString NO_GROUP = new LocalizedString(PT, "Sem Grupo").with(UK, "No group");
+
     private static final String API_PROCESS = "api_process";
 
     private static final String API_FORM = "api_form";
@@ -590,21 +592,15 @@ public class MigrationStrategy {
         Map<LocalizedString, Map<String, Set<CurricularUnitFile>>> jsonMap =
                 new HashMap<LocalizedString, Map<String, Set<CurricularUnitFile>>>();
         degreeFile.getCurricularUnitFileSet().forEach(cf -> {
-            for (Context context : contextsFor(cf.getCurricularCourse(), executionYear)) {
-                LocalizedString group = groupFor(context, executionYear);
-                Map<String, Set<CurricularUnitFile>> jsonGroup = jsonMap.get(group);
-                if (jsonGroup == null) {
-                    jsonGroup = new HashMap<String, Set<CurricularUnitFile>>();
+            if (cf.getCurricularCourse() == null) {
+                addCurricularUnitFileToMap(jsonMap, cf, NO_GROUP, null);
+            } else {
+                for (Context context : contextsFor(cf.getCurricularCourse(), executionYear)) {
+                    LocalizedString group = groupFor(context, executionYear);
+                    ExecutionSemester executionSemester = getExecutionSemester(context, executionYear);
+                    String q432 = context.getCurricularYear() + " / " + executionSemester.getName();
+                    addCurricularUnitFileToMap(jsonMap, cf, group, q432);
                 }
-                ExecutionSemester executionSemester = getExecutionSemester(context, executionYear);
-                String q432 = context.getCurricularYear() + " / " + executionSemester.getName();
-                Set<CurricularUnitFile> curricularUnitFiles = jsonGroup.get(q432);
-                if (curricularUnitFiles == null) {
-                    curricularUnitFiles = new HashSet<CurricularUnitFile>();
-                }
-                curricularUnitFiles.add(cf);
-                jsonGroup.put(q432, curricularUnitFiles);
-                jsonMap.put(group, jsonGroup);
             }
         });
 
@@ -638,6 +634,21 @@ public class MigrationStrategy {
         return result;
     }
 
+    private void addCurricularUnitFileToMap(Map<LocalizedString, Map<String, Set<CurricularUnitFile>>> jsonMap,
+            CurricularUnitFile cf, LocalizedString group, String executionPeriod) {
+        Map<String, Set<CurricularUnitFile>> jsonGroup = jsonMap.get(group);
+        if (jsonGroup == null) {
+            jsonGroup = new HashMap<String, Set<CurricularUnitFile>>();
+        }
+        Set<CurricularUnitFile> curricularUnitFiles = jsonGroup.get(executionPeriod);
+        if (curricularUnitFiles == null) {
+            curricularUnitFiles = new HashSet<CurricularUnitFile>();
+        }
+        curricularUnitFiles.add(cf);
+        jsonGroup.put(executionPeriod, curricularUnitFiles);
+        jsonMap.put(group, jsonGroup);
+    }
+
     private ExecutionSemester getExecutionSemester(final Context context, final ExecutionYear executionYear) {
         final CurricularPeriod curricularPeriod = context.getCurricularPeriod();
         if (curricularPeriod.getAcademicPeriod().getName().equals("SEMESTER")) {
@@ -663,7 +674,7 @@ public class MigrationStrategy {
     private LocalizedString groupFor(final Context context, final ExecutionYear executionYear) {
         LocalizedString groupFor =
                 groupFor(context.getParentCourseGroup(), executionYear, new LocalizedString(PT, "").with(UK, ""));
-        return groupFor != null ? groupFor : new LocalizedString(PT, "Sem Grupo").with(UK, "No group");
+        return groupFor != null ? groupFor : NO_GROUP;
     }
 
     private LocalizedString groupFor(final CourseGroup group, final ExecutionYear executionYear, final LocalizedString groupName) {
