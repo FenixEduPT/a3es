@@ -4,12 +4,30 @@ import java.util.Locale;
 import java.util.Objects;
 
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.LocalizedString;
+
+import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
 import com.google.common.base.Strings;
 
 public class CurricularUnitFile extends CurricularUnitFile_Base {
+
+    public static class CurricularCourseListener extends RelationAdapter<Bennu, DegreeModule> {
+
+        @Override
+        public void beforeRemove(final Bennu bennu, final DegreeModule degreeModule) {
+            if (bennu != null && degreeModule instanceof CurricularCourse) {
+                ((CurricularCourse) degreeModule).getCurricularUnitFileSet().clear();
+            }
+        }
+    }
+
+    static {
+        CurricularCourse.getRelationRootDomainObjectDegreeModule().addListener(new CurricularCourseListener());
+    }
 
     protected CurricularUnitFile(DegreeFile degreeFile, CurricularCourse curricularCourse, LocalizedString curricularUnitName) {
         Objects.requireNonNull(degreeFile);
@@ -20,7 +38,8 @@ public class CurricularUnitFile extends CurricularUnitFile_Base {
         setCurricularUnitName(curricularUnitName);
     }
 
-    public static CurricularUnitFile create(DegreeFile degreeFile, CurricularCourse curricularCourse, LocalizedString curricularUnitName) {
+    public static CurricularUnitFile create(DegreeFile degreeFile, CurricularCourse curricularCourse,
+            LocalizedString curricularUnitName) {
         return new CurricularUnitFile(degreeFile, curricularCourse, curricularUnitName);
     }
 
