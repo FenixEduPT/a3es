@@ -232,6 +232,14 @@ public class MigrationStrategy {
     protected String getCompetenceCoursesFieldKey(String keyIndex) {
         return "q-" + getCompetenceCoursesFolderIndex() + keyIndex;
     }
+    
+    protected String getCompetenceCoursesFieldKeyII(String keyIndex) {
+        return "q-II." + getCompetenceCoursesFolderIndex() + keyIndex;
+    }
+    protected void setCompetenceCoursesField(JSONObject json, String keyIndex, Object value) {
+        json.put(getCompetenceCoursesFieldKey(keyIndex), value);
+        json.put(getCompetenceCoursesFieldKeyII(keyIndex), value);
+    }
 
     protected Map<JSONObject, String> buildCompetenceCoursesJson(DegreeFile degreeFile) {
         Map<JSONObject, String> jsons = new HashMap<JSONObject, String>();
@@ -244,7 +252,8 @@ public class MigrationStrategy {
                     String ukLanguage = " (" + UK.getDisplayLanguage() + ")";
                     String ptLanguage = " (" + PT.getDisplayLanguage() + ")";
 
-                    json.put(getCompetenceCoursesFieldKey("1.1"), curricularUnitFile.getFileName());
+                    setCompetenceCoursesField(json, "1.1", curricularUnitFile.getFileName());
+                    
                     JSONObject q62111 = new JSONObject();
                     q62111.put(
                             "en",
@@ -254,17 +263,17 @@ public class MigrationStrategy {
                             "pt",
                             cut(message("label.curricularUnitName") + ptLanguage, curricularUnitFile.getCurricularUnitName()
                                     .getContent(PT), output, 1000));
-                    json.put(getCompetenceCoursesFieldKey("1.1"), q62111);
+                    setCompetenceCoursesField(json,"1.1", q62111);
 
-                    json.put(getCompetenceCoursesFieldKey("1.2"),  cut(message("label.scientificAreaAcronym"),
+                    setCompetenceCoursesField(json,"1.2",  cut(message("label.scientificAreaAcronym"),
                             curricularUnitFile.getScientificArea(), output, 100));
-                    json.put(getCompetenceCoursesFieldKey("1.3"), cut(message("label.courseRegime"),
+                    setCompetenceCoursesField(json,"1.3", cut(message("label.courseRegime"),
                             curricularUnitFile.getCourseRegime(), output, 100));
-                    json.put(getCompetenceCoursesFieldKey("1.4"), cut(message("label.workingHours"),
+                    setCompetenceCoursesField(json,"1.4", cut(message("label.workingHours"),
                             curricularUnitFile.getWorkingHours(), output, 100));
-                    json.put(getCompetenceCoursesFieldKey("1.5"), cut(message("label.contactHours"),
+                    setCompetenceCoursesField(json,"1.5", cut(message("label.contactHours"),
                             curricularUnitFile.getContactHours(), output, 100));
-                    json.put(getCompetenceCoursesFieldKey("1.6"), cut(message("label.ects"),
+                    setCompetenceCoursesField(json,"1.6", cut(message("label.ects"),
                             curricularUnitFile.getEcts(), output, 100));
 
                     JSONObject q62117 = new JSONObject();
@@ -276,13 +285,12 @@ public class MigrationStrategy {
                             "pt",
                             cut(message("label.observations") + ptLanguage, curricularUnitFile.getObservations().getContent(PT),
                                     output, 1000));
-                    json.put(getCompetenceCoursesFieldKey("1.7"), q62117);
+                    setCompetenceCoursesField(json,"1.7", q62117);
 
-                    json.put(
-                            getCompetenceCoursesFieldKey("2"),
+                    setCompetenceCoursesField(json,"2",
                             cut(message("label.responsibleTeacherAndTeachingHours"),
                                     curricularUnitFile.getResponsibleTeacherAndTeachingHours(), output, 100));
-                    json.put(getCompetenceCoursesFieldKey("3"), curricularUnitFile.getOtherTeachersAndTeachingHours());
+                    setCompetenceCoursesField(json,"3", curricularUnitFile.getOtherTeachersAndTeachingHours());
 
                     JSONObject q6214 = new JSONObject();
                     q6214.put(
@@ -293,7 +301,7 @@ public class MigrationStrategy {
                             "pt",
                             cut(message("label.learningOutcomes") + ptLanguage, curricularUnitFile.getLearningOutcomes()
                                     .getContent(PT), output, 1000));
-                    json.put(getCompetenceCoursesFieldKey("4"), q6214);
+                    setCompetenceCoursesField(json,"4", q6214);
 
                     JSONObject q6215 = new JSONObject();
                     q6215.put(
@@ -304,7 +312,7 @@ public class MigrationStrategy {
                             "pt",
                             cut(message("label.syllabus") + ptLanguage, curricularUnitFile.getSyllabus().getContent(PT), output,
                                     1000));
-                    json.put(getCompetenceCoursesFieldKey("5"), q6215);
+                    setCompetenceCoursesField(json,"5", q6215);
 
                     JSONObject q6216 = new JSONObject();
                     q6216.put(
@@ -315,7 +323,7 @@ public class MigrationStrategy {
                             "pt",
                             cut(message("label.syllabusDemonstration") + ptLanguage, curricularUnitFile
                                     .getSyllabusDemonstration().getContent(PT), output, 1000));
-                    json.put(getCompetenceCoursesFieldKey("6"), q6216);
+                    setCompetenceCoursesField(json,"6", q6216);
 
                     JSONObject q6217 = new JSONObject();
                     q6217.put(
@@ -326,7 +334,7 @@ public class MigrationStrategy {
                             "pt",
                             cut(message("label.teachingMethodologies") + ptLanguage, curricularUnitFile
                                     .getTeachingMethodologies().getContent(PT), output, 1000));
-                    json.put(getCompetenceCoursesFieldKey("7"), q6217);
+                    setCompetenceCoursesField(json,"7", q6217);
 
                     JSONObject q6218 = new JSONObject();
                     q6218.put(
@@ -337,12 +345,10 @@ public class MigrationStrategy {
                             "pt",
                             cut(message("label.teachingMethodologiesDemonstration") + ptLanguage, curricularUnitFile
                                     .getTeachingMethodologiesDemonstration().getContent(PT), output, 3000));
-                    json.put(getCompetenceCoursesFieldKey("8"), q6218);
+                    setCompetenceCoursesField(json,"8", q6218);
 
-                    json.put(
-                            getCompetenceCoursesFieldKey("9"),
-                            cut(message("label.bibliographicReferences"), curricularUnitFile.getBibliographicReferences(),
-                                    output, 1000));
+                            setCompetenceCoursesField(json, "9",
+                                    cut(message("label.bibliographicReferences"), curricularUnitFile.getBibliographicReferences(), output, 1000));
                     jsons.put(json, output.toString());
                 });
         return jsons;
@@ -404,11 +410,18 @@ public class MigrationStrategy {
                             StringBuilder output = new StringBuilder();
 
                             toplevel.put("q-cf-name", teacherFile.getFileName());
+                            toplevel.put("q-new-cf-name", teacherFile.getFileName());
                             toplevel.put("q-cf-ies", teacherFile.getInstitution());
+                            toplevel.put("q-new-cf-ies", teacherFile.getInstitution());
                             toplevel.put("q-cf-uo", teacherFile.getOrganicUnit());
+                            toplevel.put("q-new-cf-uo", teacherFile.getOrganicUnit());
                             if (teacherFile.getA3esTeacherCategory() != null) {
                                 toplevel.put(
                                         "q-cf-cat",
+                                        teacherFile.getA3esTeacherCategory().getName().getContent()
+                                                .replaceAll(" ou equivalente", ""));
+                                toplevel.put(
+                                        "q-new-cf-cat",
                                         teacherFile.getA3esTeacherCategory().getName().getContent()
                                                 .replaceAll(" ou equivalente", ""));
                             } else {
@@ -416,6 +429,7 @@ public class MigrationStrategy {
                             }
                             if (teacherFile.getRegime() != null) {
                                 toplevel.put("q-cf-time", Float.valueOf(teacherFile.getRegime()));
+                                toplevel.put("q-new-cf-time", Float.valueOf(teacherFile.getRegime()));
                             } else {
                                 output.append(message("message.fieldName.empty", "q-cf-time"));
                             }
@@ -522,6 +536,7 @@ public class MigrationStrategy {
 
                             }
                             toplevel.put("q-cf-cfile", file);
+                            toplevel.put("q-new-cf-cfile", file);
 
                             jsons.put(toplevel, output.toString());
                         });
