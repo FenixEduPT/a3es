@@ -64,6 +64,8 @@ public class MigrationStrategy {
     protected String formId;
 
     private MessageSource messageSource;
+    
+    protected String competenceCoursesFolderIndex = "6.2.1.";
 
     public enum AccreditationType {
 
@@ -136,9 +138,8 @@ public class MigrationStrategy {
             JSONObject json = (JSONObject) processes.iterator().next();
             String id = (String) json.get("id");
             String name = (String) json.get("name");
-            if (!Strings.isNullOrEmpty(form.getDegreeFile().getDegreeCode())
-                    && form.getDegreeFile().getDegreeCode().equalsIgnoreCase(name)) {
-
+            String degreeCode = form.getDegreeFile().getDegreeCode();
+            if (!Strings.isNullOrEmpty(degreeCode) && degreeCode.trim().equalsIgnoreCase(name)) {
                 JSONArray forms = invokeToArray(webResource().path(API_FORM).queryParam("processId", id));
                 for (Object object : forms) {
                     JSONObject jsonForm = (JSONObject) object;
@@ -150,7 +151,7 @@ public class MigrationStrategy {
                 }
                 throw new RuntimeException(message("error.process.without.evaluation.form", name));
             } else {
-                throw new RuntimeException(message("error.invalid.degree.code", form.getDegreeFile().getDegreeCode()));
+                throw new RuntimeException(message("error.invalid.degree.code", degreeCode));
             }
         }
     }
@@ -184,6 +185,7 @@ public class MigrationStrategy {
     }
 
     protected List<String> uploadCompetenceCourses(ExportDegreeProcessBean form) {
+        competenceCoursesFolderIndex = form.getCompetenceCoursesFolderIndex();
         List<String> output = new ArrayList<String>();
         for (Object object : invokeToArray(webResource().path(API_FOLDER).queryParam("formId", formId))) {
             JSONObject folder = (JSONObject) object;
@@ -218,7 +220,7 @@ public class MigrationStrategy {
     }
 
     public String getCompetenceCoursesFolderIndex() {
-        return "6.2.1.";
+        return competenceCoursesFolderIndex;
     }
 
     public String getCompetenceCoursesFolderName() {
