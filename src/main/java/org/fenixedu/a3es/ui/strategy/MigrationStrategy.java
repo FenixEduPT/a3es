@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -66,6 +65,8 @@ public class MigrationStrategy {
     private MessageSource messageSource;
     
     protected String competenceCoursesFolderIndex = "6.2.1.";
+    
+    protected String degreeStudyPlanFolderIndex = "4.3.";
 
     public enum AccreditationType {
 
@@ -571,6 +572,7 @@ public class MigrationStrategy {
     }
 
     private List<String> uploadDegreeStudyPlan(ExportDegreeProcessBean form) {
+        degreeStudyPlanFolderIndex = form.getDegreeStudyPlanFolderIndex();
         List<String> output = new ArrayList<String>();
         for (Object object : invokeToArray(webResource().path(API_FOLDER).queryParam("formId", formId))) {
             JSONObject folder = (JSONObject) object;
@@ -606,8 +608,8 @@ public class MigrationStrategy {
         String ukLanguage = " (" + UK.getDisplayLanguage() + ")";
         String ptLanguage = " (" + PT.getDisplayLanguage() + ")";
         ExecutionYear executionYear = degreeFile.getAccreditationProcess().getExecutionYear();
-        Map<LocalizedString, Map<String, Set<CurricularUnitFile>>> jsonMap =
-                new HashMap<LocalizedString, Map<String, Set<CurricularUnitFile>>>();
+        Map<LocalizedString, Map<LocalizedString, Set<CurricularUnitFile>>> jsonMap =
+                new HashMap<LocalizedString, Map<LocalizedString, Set<CurricularUnitFile>>>();
         degreeFile.getCurricularUnitFileSet().forEach(cf -> {
             if (cf.getCurricularCourse() == null) {
                 addCurricularUnitFileToMap(jsonMap, cf, NO_GROUP, null);
@@ -615,7 +617,8 @@ public class MigrationStrategy {
                 for (Context context : contextsFor(cf.getCurricularCourse(), executionYear)) {
                     LocalizedString group = groupFor(context, executionYear);
                     ExecutionSemester executionSemester = getExecutionSemester(context, executionYear);
-                    String q432 = context.getCurricularYear() + " / " + executionSemester.getName();
+                    LocalizedString q432 = new LocalizedString(PT,  message("label.yearAndSemester", PT, context.getCurricularYear(), executionSemester.getSemester()));
+                    q432 = q432.with(UK, message("label.yearAndSemester", UK, context.getCurricularYear(), executionSemester.getSemester()));
                     addCurricularUnitFileToMap(jsonMap, cf, group, q432);
                 }
             }
@@ -623,15 +626,21 @@ public class MigrationStrategy {
 
         Map<JSONObject, String> result = new HashMap<JSONObject, String>();
         for (LocalizedString group : jsonMap.keySet()) {
-            Map<String, Set<CurricularUnitFile>> groupByPeriod = jsonMap.get(group);
-            for (String q432 : groupByPeriod.keySet()) {
+            Map<LocalizedString, Set<CurricularUnitFile>> groupByPeriod = jsonMap.get(group);
+            for (LocalizedString q432 : groupByPeriod.keySet()) {
                 StringBuilder output = new StringBuilder();
                 JSONObject json = new JSONObject();
                 JSONObject q431 = new JSONObject();
                 q431.put("en", cutBegining(getDegreeStudyPlanFieldKey("1") + ukLanguage, group.getContent(UK), output, 100));
                 q431.put("pt", cutBegining(getDegreeStudyPlanFieldKey("1") + ptLanguage, group.getContent(PT), output, 100));
-                json.put(getDegreeStudyPlanFieldKey("1"), q431);
-                json.put(getDegreeStudyPlanFieldKey("2"), cut(getDegreeStudyPlanFieldKey("2"), q432, output, 100));
+                setDegreeStudyPlanField(json, "1", q431);
+                json.put(getDegreeStudyPlanFieldKey("2"), cut(getDegreeStudyPlanFieldKey("2"), q432.getContent(PT), output, 100));
+                
+                JSONObject q432II = new JSONObject();
+                q432II.put("en", cutBegining(getDegreeStudyPlanFieldKeyII("2") + ukLanguage, q432.getContent(UK), output, 100));
+                q432II.put("pt", cutBegining(getDegreeStudyPlanFieldKeyII("2") + ptLanguage, q432.getContent(PT), output, 100));
+                json.put(getDegreeStudyPlanFieldKeyII("2"), q432II);
+                
                 JSONArray curricularUnitsArray = new JSONArray();
                 for (CurricularUnitFile cf : groupByPeriod.get(q432)) {
                     JSONObject curricularUnit = new JSONObject();
@@ -651,11 +660,11 @@ public class MigrationStrategy {
         return result;
     }
 
-    private void addCurricularUnitFileToMap(Map<LocalizedString, Map<String, Set<CurricularUnitFile>>> jsonMap,
-            CurricularUnitFile cf, LocalizedString group, String executionPeriod) {
-        Map<String, Set<CurricularUnitFile>> jsonGroup = jsonMap.get(group);
+    private void addCurricularUnitFileToMap(Map<LocalizedString, Map<LocalizedString, Set<CurricularUnitFile>>> jsonMap,
+            CurricularUnitFile cf, LocalizedString group, LocalizedString executionPeriod) {
+        Map<LocalizedString, Set<CurricularUnitFile>> jsonGroup = jsonMap.get(group);
         if (jsonGroup == null) {
-            jsonGroup = new HashMap<String, Set<CurricularUnitFile>>();
+            jsonGroup = new HashMap<LocalizedString, Set<CurricularUnitFile>>();
         }
         Set<CurricularUnitFile> curricularUnitFiles = jsonGroup.get(executionPeriod);
         if (curricularUnitFiles == null) {
@@ -681,11 +690,19 @@ public class MigrationStrategy {
     }
 
     public String getDegreeStudyPlanFolderIndex() {
-        return "4.3.";
+        return degreeStudyPlanFolderIndex;
     }
 
     protected String getDegreeStudyPlanFieldKey(String keyIndex) {
         return "q-" + getDegreeStudyPlanFolderIndex() + keyIndex;
+    }
+    
+    protected String getDegreeStudyPlanFieldKeyII(String keyIndex) {
+        return "q-II." + getDegreeStudyPlanFolderIndex() + keyIndex;
+    }
+    protected void setDegreeStudyPlanField(JSONObject json, String keyIndex, Object value) {
+        json.put(getDegreeStudyPlanFieldKey(keyIndex), value);
+        json.put(getDegreeStudyPlanFieldKeyII(keyIndex), value);
     }
 
     private LocalizedString groupFor(final Context context, final ExecutionYear executionYear) {
@@ -733,6 +750,10 @@ public class MigrationStrategy {
 
     private String message(String code, Object... args) {
         return messageSource.getMessage(code, args, I18N.getLocale());
+    }
+    
+    private String message(String code, Locale locale, Object... args) {
+        return messageSource.getMessage(code, args, locale);
     }
 
 }
