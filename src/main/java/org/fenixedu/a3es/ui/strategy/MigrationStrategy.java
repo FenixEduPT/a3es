@@ -644,12 +644,14 @@ public class MigrationStrategy {
                 JSONArray curricularUnitsArray = new JSONArray();
                 for (CurricularUnitFile cf : groupByPeriod.get(q432)) {
                     JSONObject curricularUnit = new JSONObject();
-                    curricularUnit.put("curricularUnit", cf.getCurricularUnitName().getContent());
+                    curricularUnit.put("curricularUnit", cf.getCurricularUnitName().getContent(PT) + " / "
+                            + cf.getCurricularUnitName().getContent(UK));
                     curricularUnit.put("scientificArea", cf.getScientificArea());
                     curricularUnit.put("type", cf.getCourseRegime());
                     curricularUnit.put("totalWorkingHours", cf.getWorkingHours());
                     curricularUnit.put("totalContactHours", cf.getContactHours());
                     curricularUnit.put("credits", cf.getEcts());
+                    curricularUnit.put("ects", cf.getEcts());
                     curricularUnit.put("observations", cf.getObservations().getContent());
                     curricularUnitsArray.add(curricularUnit);
                 }
