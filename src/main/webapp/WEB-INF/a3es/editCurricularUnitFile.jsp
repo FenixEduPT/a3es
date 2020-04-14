@@ -63,6 +63,13 @@ ${portal.toolkit()}
 	</div>
 	<hr />
 	<div class="form-group">
+		<label for="courseLoadPerType" class="col-sm-12"><spring:message code="label.courseLoadPerType" />:</label>
+		<div class="col-sm-12">
+			<input id="courseLoadPerType" name="courseLoadPerType" class="form-control limitedSizeString" value="<c:out value='${form.courseLoadPerType}'/>" oninput="validateStringSize(this, 100)"/>
+		</div>
+	</div>
+	<hr />
+	<div class="form-group">
 		<label for="ects" class="col-sm-12"><spring:message code="label.ects" />:</label>
 		<div class="col-sm-12">
 			<input id="ects" name="ects" class="form-control limitedSizeString" value="<c:out value='${form.ects}'/>" oninput="validateStringSize(this, 100)"/>

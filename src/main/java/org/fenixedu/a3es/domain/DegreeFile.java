@@ -19,6 +19,7 @@ public class DegreeFile extends DegreeFile_Base {
         setAccreditationProcess(accreditationProcess);
         setFileName(degreeName);
         setDegreeAcronym(degreeAcronym);
+        setDegree(degree);
     }
 
     public static DegreeFile create(AccreditationProcess accreditationProcess, Degree degree, String degreeName,
