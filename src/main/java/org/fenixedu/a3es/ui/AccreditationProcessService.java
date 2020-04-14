@@ -2,7 +2,9 @@ package org.fenixedu.a3es.ui;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +41,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.BibliographicReference;
+import org.fenixedu.academic.domain.degreeStructure.CompetenceCourseLoad;
 import org.fenixedu.academic.domain.degreeStructure.RegimeType;
 import org.fenixedu.academic.domain.degreeStructure.RootCourseGroup;
 import org.fenixedu.academic.domain.organizationalStructure.ScientificAreaUnit;
@@ -147,6 +150,7 @@ public class AccreditationProcessService {
                         String scientificArea = scientificAreaUnit == null ? null : scientificAreaUnit.getAcronym();
                         String workingHours = String.valueOf(course.getAutonomousWorkHours(executionSemester));
                         String contactHours = String.valueOf(course.getContactLoad(executionSemester));
+                        String courseLoadPerType = getCourseLoadPerType(course, executionSemester);
                         String ects = String.valueOf(course.getEctsCredits(executionSemester));
                         RegimeType regime = course.getRegime(executionSemester);
                         String courseRegime = regime == null ? null : regime.getLocalizedName();
@@ -172,9 +176,9 @@ public class AccreditationProcessService {
 
                         String bibliographicReferencesString = Joiner.on("; ").join(references);
 
-                        curricularUnitFile.edit(scientificArea, courseRegime, workingHours, contactHours, ects, observations,
-                                responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes, syllabus,
-                                null, teachingMethodologies, null, bibliographicReferencesString);
+                        curricularUnitFile.edit(scientificArea, courseRegime, workingHours, contactHours, courseLoadPerType, ects, observations,
+                                responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes, syllabus, null,
+                                teachingMethodologies, null, bibliographicReferencesString);
 
                         for (Professorship professorhip : professorship) {
                             TeacherFile teacherFile =
@@ -187,6 +191,43 @@ public class AccreditationProcessService {
             }
         }
         FILLERS.forEach(f -> f.fill(degree, degreeFile));
+    }
+
+    private String getCourseLoadPerType(CurricularCourse course, ExecutionSemester executionSemester) {
+        Set<String> hours = new HashSet<String>();
+        Collection<CompetenceCourseLoad> competenceCourseLoads = course.getCompetenceCourse().getCompetenceCourseLoads(executionSemester);
+        double theoreticalHours = competenceCourseLoads.stream().map(ccl -> ccl.getTheoreticalHours()).reduce(0.0, Double::sum).doubleValue();
+        double problemsHours = competenceCourseLoads.stream().map(ccl -> ccl.getProblemsHours()).reduce(0.0, Double::sum).doubleValue();
+        double laboratorialHours = competenceCourseLoads.stream().map(ccl -> ccl.getLaboratorialHours()).reduce(0.0, Double::sum).doubleValue();
+        double seminaryHours = competenceCourseLoads.stream().map(ccl -> ccl.getSeminaryHours()).reduce(0.0, Double::sum).doubleValue();
+        double fieldWorkHours = competenceCourseLoads.stream().map(ccl -> ccl.getFieldWorkHours()).reduce(0.0, Double::sum).doubleValue();
+        double trainingPeriodHours = competenceCourseLoads.stream().map(ccl -> ccl.getTrainingPeriodHours()).reduce(0.0, Double::sum).doubleValue();
+        double tutorialOrientationHours =
+                competenceCourseLoads.stream().map(ccl -> ccl.getTutorialOrientationHours()).reduce(0.0, Double::sum).doubleValue();
+
+        if (theoreticalHours != 0.0) {
+            hours.add("T - " + BigDecimal.valueOf(theoreticalHours * CompetenceCourseLoad.NUMBER_OF_WEEKS).setScale(2, BigDecimal.ROUND_HALF_UP));
+        }
+        if (problemsHours != 0.0) {
+            hours.add("TP - " + BigDecimal.valueOf(problemsHours * CompetenceCourseLoad.NUMBER_OF_WEEKS).setScale(2, BigDecimal.ROUND_HALF_UP));
+        }
+        if (laboratorialHours != 0.0) {
+            hours.add("PL - " + BigDecimal.valueOf(laboratorialHours * CompetenceCourseLoad.NUMBER_OF_WEEKS).setScale(2, BigDecimal.ROUND_HALF_UP));
+        }
+        if (seminaryHours != 0.0) {
+            hours.add("S - " + BigDecimal.valueOf(seminaryHours * CompetenceCourseLoad.NUMBER_OF_WEEKS).setScale(2, BigDecimal.ROUND_HALF_UP));
+        }
+        if (fieldWorkHours != 0.0) {
+            hours.add("TC - " + BigDecimal.valueOf(fieldWorkHours * CompetenceCourseLoad.NUMBER_OF_WEEKS).setScale(2, BigDecimal.ROUND_HALF_UP));
+        }
+        if (trainingPeriodHours != 0.0) {
+            hours.add("E - " + BigDecimal.valueOf(trainingPeriodHours * CompetenceCourseLoad.NUMBER_OF_WEEKS).setScale(2, BigDecimal.ROUND_HALF_UP));
+        }
+        if (tutorialOrientationHours != 0.0) {
+            hours.add("OT - "
+                    + BigDecimal.valueOf(tutorialOrientationHours * CompetenceCourseLoad.NUMBER_OF_WEEKS).setScale(2, BigDecimal.ROUND_HALF_UP));
+        }
+        return String.join("; ", hours);
     }
 
     private DegreeCurricularPlan findDegreeCurricularPlan(final Degree degree, final ExecutionYear executionYear) {
@@ -222,11 +263,10 @@ public class AccreditationProcessService {
 
     @Atomic(mode = TxMode.WRITE)
     public void editCurricularUnitFile(CurricularUnitFileBean form) {
-        form.getCurricularUnitFile().edit(form.getScientificArea(), form.getCourseRegime(), form.getWorkingHours(),
-                form.getContactHours(), form.getEcts(), form.getObservations(), form.getResponsibleTeacherAndTeachingHours(),
-                form.getOtherTeachersAndTeachingHours(), form.getLearningOutcomes(), form.getSyllabus(),
-                form.getSyllabusDemonstration(), form.getTeachingMethodologies(), form.getTeachingMethodologiesDemonstration(),
-                form.getBibliographicReferences());
+        form.getCurricularUnitFile().edit(form.getScientificArea(), form.getCourseRegime(), form.getWorkingHours(), form.getContactHours(),
+                form.getCourseLoadPerType(), form.getEcts(), form.getObservations(), form.getResponsibleTeacherAndTeachingHours(),
+                form.getOtherTeachersAndTeachingHours(), form.getLearningOutcomes(), form.getSyllabus(), form.getSyllabusDemonstration(),
+                form.getTeachingMethodologies(), form.getTeachingMethodologiesDemonstration(), form.getBibliographicReferences());
     }
 
     @Atomic(mode = TxMode.WRITE)
