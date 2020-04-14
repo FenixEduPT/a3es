@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -231,7 +230,14 @@ public class AccreditationProcessService {
 
     @Atomic(mode = TxMode.WRITE)
     public void createTeacherFile(TeacherFileBean form) {
-        TeacherFile.create(form.getFileName(), form.getDegreeFile());
+        if (form.getUser() != null) {
+            TeacherFile teacherFile = TeacherFile.create(form.getUser(), form.getDegreeFile());
+            if (form.getUser().getPerson().getTeacher() != null) {
+                FILLERS.forEach(f -> f.fill(form.getUser().getPerson().getTeacher(), teacherFile, form.getDegreeFile().getDegree()));
+            }
+        } else {
+            TeacherFile.create(form.getFileName(), form.getDegreeFile());
+        }
         return;
     }
 

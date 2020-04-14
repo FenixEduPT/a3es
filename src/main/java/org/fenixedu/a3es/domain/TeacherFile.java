@@ -54,12 +54,15 @@ public class TeacherFile extends TeacherFile_Base {
             teacherFile = new TeacherFile(user.getPerson().getName());
             teacherFile.setUser(user);
             teacherFile.addResponsible(user);
-            TeacherAuthorization teacherAuthorization = user.getPerson().getTeacher()
-                    .getLatestTeacherAuthorizationInInterval(
-                            a3esFile.getAccreditationProcess().getExecutionYear().getAcademicInterval().toInterval())
-                    .orElse(null);
-            if (teacherAuthorization != null) {
-                teacherFile.setA3esTeacherCategory(teacherAuthorization.getTeacherCategory().getA3esTeacherCategory());
+            if (user.getPerson().getTeacher() != null) {
+                TeacherAuthorization teacherAuthorization =
+                        user.getPerson()
+                                .getTeacher()
+                                .getLatestTeacherAuthorizationInInterval(
+                                        a3esFile.getAccreditationProcess().getExecutionYear().getAcademicInterval().toInterval()).orElse(null);
+                if (teacherAuthorization != null) {
+                    teacherFile.setA3esTeacherCategory(teacherAuthorization.getTeacherCategory().getA3esTeacherCategory());
+                }
             }
             teacherFile.prefill();
         }

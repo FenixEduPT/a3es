@@ -1,8 +1,6 @@
 package org.fenixedu.a3es.domain.util;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -14,6 +12,7 @@ import org.fenixedu.a3es.domain.A3esTeachingService;
 import org.fenixedu.a3es.domain.DegreeFile;
 import org.fenixedu.a3es.domain.TeacherActivity;
 import org.fenixedu.a3es.domain.TeacherFile;
+import org.fenixedu.bennu.core.domain.User;
 import org.json.simple.JSONArray;
 
 import com.google.common.base.Strings;
@@ -22,6 +21,7 @@ public class TeacherFileBean implements Serializable {
 
     DegreeFile degreeFile;
     TeacherFile teacherFile;
+    User user;
 
     String fileName;
     String teacherName;
@@ -89,6 +89,14 @@ public class TeacherFileBean implements Serializable {
 
     public void setTeacherFile(TeacherFile teacherFile) {
         this.teacherFile = teacherFile;
+    }
+    
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getFileName() {
