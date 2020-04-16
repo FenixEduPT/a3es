@@ -16,6 +16,7 @@ import org.fenixedu.a3es.domain.A3esFile;
 import org.fenixedu.a3es.domain.A3esQualification;
 import org.fenixedu.a3es.domain.A3esTeachingService;
 import org.fenixedu.a3es.domain.AccreditationProcess;
+import org.fenixedu.a3es.domain.CurricularContext;
 import org.fenixedu.a3es.domain.CurricularUnitFile;
 import org.fenixedu.a3es.domain.DegreeFile;
 import org.fenixedu.a3es.domain.DevelopmentActivity;
@@ -178,7 +179,7 @@ public class AccreditationProcessService {
                         curricularUnitFile.edit(scientificArea, courseRegime, workingHours, contactHours, courseLoadPerType, ects, observations,
                                 responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes, syllabus, null,
                                 teachingMethodologies, null, bibliographicReferencesString);
-
+                        CurricularContext.createContexts(curricularUnitFile);
                         for (Professorship professorhip : professorship) {
                             TeacherFile teacherFile =
                                     TeacherFile.create(professorhip.getTeacher().getPerson().getUser(), curricularUnitFile);
