@@ -629,7 +629,7 @@ public class MigrationStrategy {
                 curricularUnit.put("curricularUnit", cf.getCurricularUnitName().getContent(PT) + " / " + cf.getCurricularUnitName().getContent(UK));
                 curricularUnit.put("scientificArea", cf.getScientificArea());
                 curricularUnit.put("type", cf.getCourseRegime());
-                curricularUnit.put("totalWorkingHours", cf.getWorkingHours());
+                curricularUnit.put("totalWorkingHours", cf.getTotalLoad());
                 curricularUnit.put("totalContactHours", cf.getCourseLoadPerType());
                 curricularUnit.put("credits", cf.getEcts());
                 curricularUnit.put("ects", cf.getEcts());

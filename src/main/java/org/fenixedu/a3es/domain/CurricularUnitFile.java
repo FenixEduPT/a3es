@@ -43,15 +43,15 @@ public class CurricularUnitFile extends CurricularUnitFile_Base {
         return new CurricularUnitFile(degreeFile, curricularCourse, curricularUnitName);
     }
 
-    public void edit(String scientificArea, String courseRegime, String workingHours, String contactHours, String courseLoadPerType, String ects,
-            LocalizedString observations, String responsibleTeacherAndTeachingHours, String otherTeachersAndTeachingHours,
-            LocalizedString learningOutcomes, LocalizedString syllabus, LocalizedString syllabusDemonstration,
-            LocalizedString teachingMethodologies, LocalizedString teachingMethodologiesDemonstration,
-            String bibliographicReferences) {
+    public void edit(String scientificArea, String courseRegime, String workingHours, String contactHours, String totalLoad,
+            String courseLoadPerType, String ects, LocalizedString observations, String responsibleTeacherAndTeachingHours,
+            String otherTeachersAndTeachingHours, LocalizedString learningOutcomes, LocalizedString syllabus, LocalizedString syllabusDemonstration,
+            LocalizedString teachingMethodologies, LocalizedString teachingMethodologiesDemonstration, String bibliographicReferences) {
         setScientificArea(scientificArea);
         setCourseRegime(courseRegime);
         setWorkingHours(workingHours);
         setContactHours(contactHours);
+        setTotalLoad(totalLoad);
         setCourseLoadPerType(courseLoadPerType);
         setEcts(ects);
         setObservations(observations);
@@ -88,6 +88,11 @@ public class CurricularUnitFile extends CurricularUnitFile_Base {
     @Override
     public String getContactHours() {
         return super.getContactHours();
+    }
+    
+    @Override
+    public String getTotalLoad() {
+        return super.getTotalLoad();
     }
     
     @Override

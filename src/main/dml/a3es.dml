@@ -23,6 +23,7 @@ class CurricularUnitFile extends A3esFile {
 	protected String courseRegime;
 	protected String workingHours;
 	protected String contactHours;
+	protected String totalLoad;
 	protected String courseLoadPerType;
 	protected String ects;
 	protected LocalizedString observations;
