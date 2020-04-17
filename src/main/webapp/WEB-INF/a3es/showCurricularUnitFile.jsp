@@ -70,6 +70,13 @@ $().ready(function() {
 	</div>
 	<hr />
 	<div class="form-group">
+		<label for="totalLoad" class="col-sm-12"><spring:message code="label.totalLoad" />:</label>
+		<div class="col-sm-12">
+			<input id="totalLoad" name="totalLoad" class="form-control limitedSizeString" value="<c:out value='${form.totalLoad}'/>" oninput="validateStringSize(this, 100)"/>
+		</div>
+	</div>
+	<hr />
+	<div class="form-group">
 		<label for="courseLoadPerType" class="col-sm-12"><spring:message code="label.courseLoadPerType" />:</label>
 		<div class="col-sm-12">
 			<input id="courseLoadPerType" name="courseLoadPerType" class="form-control" value="<c:out value='${form.courseLoadPerType}'/>" readonly="readonly"/>

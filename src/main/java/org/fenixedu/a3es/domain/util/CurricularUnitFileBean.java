@@ -15,6 +15,7 @@ public class CurricularUnitFileBean implements Serializable {
     String courseRegime;
     String workingHours;
     String contactHours;
+    String totalLoad;
     String courseLoadPerType;
     String ects;
     LocalizedString observations;
@@ -37,6 +38,7 @@ public class CurricularUnitFileBean implements Serializable {
         setCourseRegime(curricularUnitFile.getCourseRegime());
         setWorkingHours(curricularUnitFile.getWorkingHours());
         setContactHours(curricularUnitFile.getContactHours());
+        setTotalLoad(curricularUnitFile.getTotalLoad());
         setCourseLoadPerType(curricularUnitFile.getCourseLoadPerType());
         setEcts(curricularUnitFile.getEcts());
         setObservations(curricularUnitFile.getObservations());
@@ -106,6 +108,15 @@ public class CurricularUnitFileBean implements Serializable {
         this.contactHours = contactHours;
     }
     
+    
+    public String getTotalLoad() {
+        return totalLoad;
+    }
+
+    public void setTotalLoad(String totalLoad) {
+        this.totalLoad = totalLoad;
+    }
+
     public String getCourseLoadPerType() {
         return courseLoadPerType;
     }

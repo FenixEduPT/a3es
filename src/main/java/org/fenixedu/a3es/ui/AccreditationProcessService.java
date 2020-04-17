@@ -150,6 +150,7 @@ public class AccreditationProcessService {
                         String scientificArea = scientificAreaUnit == null ? null : scientificAreaUnit.getAcronym();
                         String workingHours = String.valueOf(course.getAutonomousWorkHours(executionSemester));
                         String contactHours = String.valueOf(course.getContactLoad(executionSemester));
+                        String totalLoad = String.valueOf(course.getTotalLoad(executionSemester));
                         String courseLoadPerType = getCourseLoadPerType(course, executionSemester);
                         String ects = String.valueOf(course.getEctsCredits(executionSemester));
                         RegimeType regime = course.getRegime(executionSemester);
@@ -176,8 +177,8 @@ public class AccreditationProcessService {
 
                         String bibliographicReferencesString = Joiner.on("; ").join(references);
 
-                        curricularUnitFile.edit(scientificArea, courseRegime, workingHours, contactHours, courseLoadPerType, ects, observations,
-                                responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes, syllabus, null,
+                        curricularUnitFile.edit(scientificArea, courseRegime, workingHours, contactHours, totalLoad, courseLoadPerType, ects,
+                                observations, responsibleTeacherAndTeachingHours, otherTeachersAndTeachingHours, learningOutcomes, syllabus, null,
                                 teachingMethodologies, null, bibliographicReferencesString);
                         CurricularContext.createContexts(curricularUnitFile);
                         for (Professorship professorhip : professorship) {
@@ -264,9 +265,10 @@ public class AccreditationProcessService {
     @Atomic(mode = TxMode.WRITE)
     public void editCurricularUnitFile(CurricularUnitFileBean form) {
         form.getCurricularUnitFile().edit(form.getScientificArea(), form.getCourseRegime(), form.getWorkingHours(), form.getContactHours(),
-                form.getCourseLoadPerType(), form.getEcts(), form.getObservations(), form.getResponsibleTeacherAndTeachingHours(),
-                form.getOtherTeachersAndTeachingHours(), form.getLearningOutcomes(), form.getSyllabus(), form.getSyllabusDemonstration(),
-                form.getTeachingMethodologies(), form.getTeachingMethodologiesDemonstration(), form.getBibliographicReferences());
+                form.getTotalLoad(), form.getCourseLoadPerType(), form.getEcts(), form.getObservations(),
+                form.getResponsibleTeacherAndTeachingHours(), form.getOtherTeachersAndTeachingHours(), form.getLearningOutcomes(),
+                form.getSyllabus(), form.getSyllabusDemonstration(), form.getTeachingMethodologies(), form.getTeachingMethodologiesDemonstration(),
+                form.getBibliographicReferences());
     }
 
     @Atomic(mode = TxMode.WRITE)
