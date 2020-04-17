@@ -150,6 +150,7 @@ public class CurricularUnitFile extends CurricularUnitFile_Base {
         setDegreeFile(null);
         setResponsibleGroup(null);
         setCurricularCourse(null);
+        getCurricularContextSet().forEach(cc -> cc.removeCurricularUnitFile(this));
         super.deleteDomainObject();
     }
 

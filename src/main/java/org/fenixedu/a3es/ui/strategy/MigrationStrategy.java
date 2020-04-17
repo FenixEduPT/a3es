@@ -3,7 +3,6 @@ package org.fenixedu.a3es.ui.strategy;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -18,17 +17,11 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.fenixedu.a3es.domain.CurricularUnitFile;
+import org.fenixedu.a3es.domain.CurricularContext;
 import org.fenixedu.a3es.domain.DegreeFile;
 import org.fenixedu.a3es.domain.TeacherActivity;
 import org.fenixedu.a3es.domain.TeacherFile;
 import org.fenixedu.a3es.domain.util.ExportDegreeProcessBean;
-import org.fenixedu.academic.domain.CurricularCourse;
-import org.fenixedu.academic.domain.ExecutionSemester;
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
-import org.fenixedu.academic.domain.degreeStructure.Context;
-import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.bennu.A3esSpringConfiguration;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
@@ -604,88 +597,51 @@ public class MigrationStrategy {
     }
 
     private Map<JSONObject, String> buildDegreeStudyPlanJson(DegreeFile degreeFile) {
-
         String ukLanguage = " (" + UK.getDisplayLanguage() + ")";
         String ptLanguage = " (" + PT.getDisplayLanguage() + ")";
-        ExecutionYear executionYear = degreeFile.getAccreditationProcess().getExecutionYear();
-        Map<LocalizedString, Map<LocalizedString, Set<CurricularUnitFile>>> jsonMap =
-                new HashMap<LocalizedString, Map<LocalizedString, Set<CurricularUnitFile>>>();
-        degreeFile.getCurricularUnitFileSet().forEach(cf -> {
-            if (cf.getCurricularCourse() == null) {
-                addCurricularUnitFileToMap(jsonMap, cf, NO_GROUP, null);
-            } else {
-                for (Context context : contextsFor(cf.getCurricularCourse(), executionYear)) {
-                    LocalizedString group = groupFor(context, executionYear);
-                    ExecutionSemester executionSemester = getExecutionSemester(context, executionYear);
-                    LocalizedString q432 = new LocalizedString(PT,  message("label.yearAndSemester", PT, context.getCurricularYear(), executionSemester.getSemester()));
-                    q432 = q432.with(UK, message("label.yearAndSemester", UK, context.getCurricularYear(), executionSemester.getSemester()));
-                    addCurricularUnitFileToMap(jsonMap, cf, group, q432);
-                }
-            }
-        });
-
+        
+        Set<CurricularContext> curricularContextSet =
+                degreeFile.getCurricularUnitFileSet().stream().flatMap(cuf -> cuf.getCurricularContextSet().stream()).collect(Collectors.toSet());
         Map<JSONObject, String> result = new HashMap<JSONObject, String>();
-        for (LocalizedString group : jsonMap.keySet()) {
-            Map<LocalizedString, Set<CurricularUnitFile>> groupByPeriod = jsonMap.get(group);
-            for (LocalizedString q432 : groupByPeriod.keySet()) {
-                StringBuilder output = new StringBuilder();
-                JSONObject json = new JSONObject();
-                JSONObject q431 = new JSONObject();
-                q431.put("en", cutBegining(getDegreeStudyPlanFieldKey("1") + ukLanguage, group.getContent(UK), output, 100));
-                q431.put("pt", cutBegining(getDegreeStudyPlanFieldKey("1") + ptLanguage, group.getContent(PT), output, 100));
-                setDegreeStudyPlanField(json, "1", q431);
-                json.put(getDegreeStudyPlanFieldKey("2"), cut(getDegreeStudyPlanFieldKey("2"), q432.getContent(PT), output, 100));
-                
-                JSONObject q432II = new JSONObject();
-                q432II.put("en", cutBegining(getDegreeStudyPlanFieldKeyII("2") + ukLanguage, q432.getContent(UK), output, 100));
-                q432II.put("pt", cutBegining(getDegreeStudyPlanFieldKeyII("2") + ptLanguage, q432.getContent(PT), output, 100));
-                json.put(getDegreeStudyPlanFieldKeyII("2"), q432II);
-                
-                JSONArray curricularUnitsArray = new JSONArray();
-                for (CurricularUnitFile cf : groupByPeriod.get(q432)) {
-                    JSONObject curricularUnit = new JSONObject();
-                    curricularUnit.put("curricularUnit", cf.getCurricularUnitName().getContent(PT) + " / "
-                            + cf.getCurricularUnitName().getContent(UK));
-                    curricularUnit.put("scientificArea", cf.getScientificArea());
-                    curricularUnit.put("type", cf.getCourseRegime());
-                    curricularUnit.put("totalWorkingHours", cf.getWorkingHours());
-                    curricularUnit.put("totalContactHours", cf.getCourseLoadPerType());
-                    curricularUnit.put("credits", cf.getEcts());
-                    curricularUnit.put("ects", cf.getEcts());
-                    curricularUnit.put("observations", cf.getObservations().getContent());
-                    curricularUnitsArray.add(curricularUnit);
-                }
-                json.put("grid", curricularUnitsArray);
-                result.put(json, output.toString());
-            }
+
+        for (CurricularContext curricularContext : curricularContextSet) {
+            StringBuilder output = new StringBuilder();
+            JSONObject json = new JSONObject();
+            JSONObject q431 = new JSONObject();
+            q431.put("en",
+                    cutBegining(getDegreeStudyPlanFieldKey("1") + ukLanguage, curricularContext.getCurricularGroup().getContent(UK), output, 100));
+            q431.put("pt",
+                    cutBegining(getDegreeStudyPlanFieldKey("1") + ptLanguage, curricularContext.getCurricularGroup().getContent(PT), output, 100));
+            setDegreeStudyPlanField(json, "1", q431);
+            json.put(getDegreeStudyPlanFieldKey("2"),
+                    cut(getDegreeStudyPlanFieldKey("2"), curricularContext.getCurricularPeriod().getContent(PT), output, 100));
+
+            JSONObject q432II = new JSONObject();
+            q432II.put("en",
+                    cutBegining(getDegreeStudyPlanFieldKeyII("2") + ukLanguage, curricularContext.getCurricularPeriod().getContent(UK), output, 100));
+            q432II.put("pt",
+                    cutBegining(getDegreeStudyPlanFieldKeyII("2") + ptLanguage, curricularContext.getCurricularPeriod().getContent(PT), output, 100));
+            json.put(getDegreeStudyPlanFieldKeyII("2"), q432II);
+
+            JSONArray curricularUnitsArray = new JSONArray();
+            curricularContext.getCurricularUnitFileSet().stream().filter(cuf -> cuf.getDegreeFile().equals(degreeFile)).forEach(cf -> {
+                JSONObject curricularUnit = new JSONObject();
+                curricularUnit.put("curricularUnit", cf.getCurricularUnitName().getContent(PT) + " / " + cf.getCurricularUnitName().getContent(UK));
+                curricularUnit.put("scientificArea", cf.getScientificArea());
+                curricularUnit.put("type", cf.getCourseRegime());
+                curricularUnit.put("totalWorkingHours", cf.getWorkingHours());
+                curricularUnit.put("totalContactHours", cf.getCourseLoadPerType());
+                curricularUnit.put("credits", cf.getEcts());
+                curricularUnit.put("ects", cf.getEcts());
+                curricularUnit.put("observations", cf.getObservations().getContent());
+                curricularUnitsArray.add(curricularUnit);
+            });
+            json.put("grid", curricularUnitsArray);
+            result.put(json, output.toString());
         }
         return result;
     }
 
-    private void addCurricularUnitFileToMap(Map<LocalizedString, Map<LocalizedString, Set<CurricularUnitFile>>> jsonMap,
-            CurricularUnitFile cf, LocalizedString group, LocalizedString executionPeriod) {
-        Map<LocalizedString, Set<CurricularUnitFile>> jsonGroup = jsonMap.get(group);
-        if (jsonGroup == null) {
-            jsonGroup = new HashMap<LocalizedString, Set<CurricularUnitFile>>();
-        }
-        Set<CurricularUnitFile> curricularUnitFiles = jsonGroup.get(executionPeriod);
-        if (curricularUnitFiles == null) {
-            curricularUnitFiles = new HashSet<CurricularUnitFile>();
-        }
-        curricularUnitFiles.add(cf);
-        jsonGroup.put(executionPeriod, curricularUnitFiles);
-        jsonMap.put(group, jsonGroup);
-    }
-
-    private ExecutionSemester getExecutionSemester(final Context context, final ExecutionYear executionYear) {
-        final CurricularPeriod curricularPeriod = context.getCurricularPeriod();
-        if (curricularPeriod.getAcademicPeriod().getName().equals("SEMESTER")) {
-            return (curricularPeriod.getChildOrder() == 1) ? executionYear.getFirstExecutionPeriod() : executionYear
-                    .getLastExecutionPeriod();
-        } else {
-            return executionYear.getFirstExecutionPeriod();
-        }
-    }
 
     public String getDegreeStudyPlanFolderName() {
         return "4.3 Plano de estudos";
@@ -705,25 +661,6 @@ public class MigrationStrategy {
     protected void setDegreeStudyPlanField(JSONObject json, String keyIndex, Object value) {
         json.put(getDegreeStudyPlanFieldKey(keyIndex), value);
         json.put(getDegreeStudyPlanFieldKeyII(keyIndex), value);
-    }
-
-    private LocalizedString groupFor(final Context context, final ExecutionYear executionYear) {
-        LocalizedString groupFor =
-                groupFor(context.getParentCourseGroup(), executionYear, new LocalizedString(PT, "").with(UK, ""));
-        return groupFor != null ? groupFor : NO_GROUP;
-    }
-
-    private LocalizedString groupFor(final CourseGroup group, final ExecutionYear executionYear, final LocalizedString groupName) {
-        if (group == null || group.isCycleCourseGroup()) {
-            return groupName;
-        }
-        final LocalizedString newName = group.getNameI18N(executionYear).append(groupName, ", ");
-        return group.getParentContextsSet().stream().filter(c -> c.isOpen(executionYear))
-                .map(c -> groupFor(c.getParentCourseGroup(), executionYear, newName)).findAny().orElse(newName);
-    }
-
-    private Set<Context> contextsFor(final CurricularCourse curricularCourse, final ExecutionYear executionYear) {
-        return curricularCourse.getParentContextsSet().stream().filter(c -> c.isOpen(executionYear)).collect(Collectors.toSet());
     }
 
     protected String cut(String field, String content, StringBuilder output, int size) {

@@ -48,6 +48,11 @@ class TeacherFile extends A3esFile {
 	protected String degreeInstitution;
 }
 
+class CurricularContext {
+	protected LocalizedString curricularGroup;
+	protected LocalizedString curricularPeriod;
+}
+
 class A3esTeacherCategory {
 	LocalizedString name;
 }
@@ -240,6 +245,22 @@ relation A3esTeachingServiceTeacherFile {
         multiplicity 1;
     }
     A3esTeachingService playsRole a3esTeachingService {
+        multiplicity *;
+    }
+}
+
+relation AccreditationProcessCurricularContext {
+    CurricularContext playsRole curricularContext {
+        multiplicity *;
+    }
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu;
+}
+
+relation CurricularUnitFileCurricularContext {
+    CurricularUnitFile playsRole curricularUnitFile {
+        multiplicity *;
+    }
+    CurricularContext playsRole curricularContext {
         multiplicity *;
     }
 }
