@@ -663,26 +663,28 @@ public class MigrationStrategy {
         json.put(getDegreeStudyPlanFieldKeyII(keyIndex), value);
     }
 
-    protected String cut(String field, String content, StringBuilder output, int size) {
-        if (content == null) {
+    protected String cut(String field, String originalContent, StringBuilder output, int size) {
+        if (originalContent == null) {
             output.append(message("message.fieldName.empty", field));
-        } else {
-            if (content.length() > size) {
-                output.append(message("message.field.cutted", field, size));
-                return content.substring(0, size - 4) + " ...";
-            }
+            return originalContent;
+        }
+        String content = originalContent.replace("\r\n", "\n");
+        if (content.length() > size) {
+            output.append(message("message.field.cutted", field, size));
+            return content.substring(0, size - 4) + " ...";
         }
         return content;
     }
 
-    protected String cutBegining(String field, String content, StringBuilder output, int size) {
-        if (content == null) {
+    protected String cutBegining(String field, String originalContent, StringBuilder output, int size) {
+        if (originalContent == null) {
             output.append(message("message.fieldName.empty", field));
-        } else {
-            if (content.length() > size) {
-                output.append(message("message.field.cutted", field, size));
-                return "..." + content.substring((content.length() - size) + 3, content.length());
-            }
+            return originalContent;
+        }
+        String content = originalContent.replace("\r\n", "\n");
+        if (content.length() > size) {
+            output.append(message("message.field.cutted", field, size));
+            return "..." + content.substring((content.length() - size) + 3, content.length());
         }
         return content;
     }

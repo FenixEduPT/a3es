@@ -37,7 +37,7 @@ public abstract class A3esFile extends A3esFile_Base {
     }
 
     protected boolean hasValidSize(String content, int size) {
-        return (Strings.isNullOrEmpty(content) || content.length() <= size);
+        return (Strings.isNullOrEmpty(content) || content.replace("\r\n", "\n").length() <= size);
     }
 
     public void addResponsible(User user) {
