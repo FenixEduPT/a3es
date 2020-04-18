@@ -266,7 +266,7 @@ public class MigrationStrategy {
                     setCompetenceCoursesField(json,"1.3", cut(message("label.courseRegime"),
                             curricularUnitFile.getCourseRegime(), output, 100));
                     setCompetenceCoursesField(json,"1.4", cut(message("label.workingHours"),
-                            curricularUnitFile.getWorkingHours(), output, 100));
+                            curricularUnitFile.getTotalLoad(), output, 100));
                     setCompetenceCoursesField(json,"1.5", cut(message("label.contactHours"),
                             curricularUnitFile.getContactHours(), output, 100));
                     setCompetenceCoursesField(json,"1.6", cut(message("label.ects"),
