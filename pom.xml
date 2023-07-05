@@ -31,6 +31,30 @@
         <url>https://jira.fenixedu.org/browse/AEEE</url>
     </issueManagement>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-jspc-maven-plugin</artifactId>
+                <version>10.0.15</version>
+                <executions>
+                    <execution>
+                        <id>jspc</id>
+                        <goals>
+                            <goal>jspc</goal>
+                        </goals>
+                        <configuration>
+                            <jspc>
+                                <strictQuoteEscaping>false</strictQuoteEscaping>
+                                <failOnError>false</failOnError>
+                            </jspc>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
